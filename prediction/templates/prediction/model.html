@@ -1,0 +1,82 @@
+{% extends "prediction/base.html" %}
+{% load static %}
+{% block title %}Model details - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Model details and evaluation</h1>
+  {% if not info %}
+    <p>No trained model information found. Run <code>python train_model.py</code> and restart the server.</p>
+  {% else %}
+  <p>
+    Selected model: <strong>{{ info.best_model }}</strong>.
+    {% if info.calibrated %}Probabilities were <strong>calibrated</strong> (sigmoid) because this lowered the cross-validated Brier score ({{ info.brier_cv.raw }} &rarr; {{ info.brier_cv.calibrated }}).
+    {% else %}Calibration did not improve the cross-validated Brier score ({{ info.brier_cv.raw }} vs {{ info.brier_cv.calibrated }}), so the raw model is used.{% endif %}
+    Trained on {{ info.train_rows }} records and tested once on {{ info.test_rows }} unseen records
+    (class 0: {{ info.class_counts.0 }}, class 1: {{ info.class_counts.1 }}). Trained {{ info.trained_at }} with scikit-learn {{ info.scikit_learn }}{% if info.quick_mode %} (quick mode){% endif %}.
+  </p>
+
+  <h2>Model comparison</h2>
+  <p class="small">Models are ranked by cross-validated ROC-AUC on the training data only; the test columns are reported after the choice was made.</p>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Model</th><th>CV ROC-AUC</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Test ROC-AUC</th><th>Brier</th></tr></thead>
+      <tbody>
+      {% for m in info.comparison %}
+        <tr {% if m.model == info.best_model %}class="best"{% endif %}>
+          <td>{{ m.model }}</td><td>{{ m.cv_roc_auc }}</td><td>{{ m.accuracy }}</td><td>{{ m.precision }}</td>
+          <td>{{ m.recall }}</td><td>{{ m.f1 }}</td><td>{{ m.roc_auc }}</td><td>{{ m.brier }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Final model on the test set</h2>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-num">{{ info.metrics.accuracy }}</span><span class="small">accuracy</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.precision }}</span><span class="small">precision</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.recall }}</span><span class="small">recall</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.f1 }}</span><span class="small">F1-score</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.roc_auc }}</span><span class="small">ROC-AUC</span></div>
+  </div>
+  <p class="small">Confusion matrix: TN {{ info.confusion.tn }}, FP {{ info.confusion.fp }}, FN {{ info.confusion.fn }}, TP {{ info.confusion.tp }}. Recall matters most here because a missed patient is the most serious error.</p>
+
+  <h2>External validation</h2>
+  {% if info.external_validation %}
+  <p class="small">The final model was trained only on the main file and then tested on these separate datasets. Missing values were filled with medians learned from the training data.</p>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>File</th><th>Rows</th><th>Missing values</th><th>Accuracy</th><th>Recall</th><th>ROC-AUC</th></tr></thead>
+      <tbody>
+      {% for name, m in info.external_validation.items %}
+        <tr><td>{{ name }}</td><td>{{ m.rows }}</td><td>{{ m.missing_share }}</td><td>{{ m.accuracy }}</td><td>{{ m.recall }}</td><td>{{ m.roc_auc }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>No external dataset found. Put extra files in <code>dataset/external/</code> and run <code>python train_model.py</code>.</p>
+  {% endif %}
+
+  <h2>Which inputs matter most</h2>
+  <p class="small">Permutation importance on the test set: how much the ROC-AUC drops when one input is shuffled (shown as a share of the total).</p>
+  <div class="factors">
+    {% for f in info.feature_importance %}
+    <div class="factor">
+      <div class="factor-name">{{ f.feature }}</div>
+      <div class="factor-bar"><div class="bar up" data-width="{{ f.bar }}"></div></div>
+      <div class="factor-delta">{{ f.importance }}%</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  <h2>Charts</h2>
+  <div class="figure-grid">
+    {% for fig in info.figures %}
+      <img src="{% static 'prediction/reports/'|add:fig %}" alt="{{ fig }}" loading="lazy">
+    {% endfor %}
+  </div>
+  <p class="small">Risk levels: below 30% low, 30% to below 60% moderate, 60% and above high (fixed limits chosen for this project, not clinical thresholds). This system is a screening aid and not a diagnosis.</p>
+  {% endif %}
+</section>
+{% endblock %}

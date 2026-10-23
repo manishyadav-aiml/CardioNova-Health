@@ -1,0 +1,22 @@
+{% extends "prediction/base.html" %}
+{% block title %}Search - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Search</h1>
+  <form method="get" action="{% url 'search' %}" class="search" role="search">
+    <label for="search-q" class="sr-only">Search</label>
+    <input id="search-q" type="search" name="q" value="{{ q }}" maxlength="100" class="form-control" placeholder="Search pages, FAQ and your history">
+    <button type="submit" class="btn btn-small">Search</button>
+  </form>
+  {% if too_short %}<p class="small">Type at least 2 characters.</p>{% endif %}
+  {% if q and not too_short %}
+    {% if pages or answers or records %}
+      {% if pages %}<h2>Pages</h2><ul class="result-list">{% for p in pages %}<li><a href="{{ p.url }}">{{ p.title }}</a><br><span class="small">{{ p.text }}</span></li>{% endfor %}</ul>{% endif %}
+      {% if answers %}<h2>FAQ</h2><ul class="result-list">{% for a in answers %}<li><a href="{% url 'faq' %}">{{ a.q }}</a><br><span class="small">{{ a.a }}</span></li>{% endfor %}</ul>{% endif %}
+      {% if records %}<h2>Your predictions</h2><ul class="result-list">{% for r in records %}<li><a href="{% url 'result' r.pk %}">{{ r.created_at|date:"d M Y, H:i" }} - {{ r.patient_label|default:"no label" }}</a> <span class="badge badge-{{ r.risk_level|lower }}">{{ r.risk_level }}</span> <span class="small">{{ r.probability|floatformat:1 }}%</span></li>{% endfor %}</ul>{% endif %}
+    {% else %}
+      <p>No results for &ldquo;{{ q }}&rdquo;. Try another word, or <a href="{% url 'contact' %}">contact us</a>.</p>
+    {% endif %}
+  {% endif %}
+</section>
+{% endblock %}

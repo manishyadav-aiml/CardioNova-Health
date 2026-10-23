@@ -1,0 +1,4 @@
+# Used for deployment (Docker, Render, Railway): everything in requirements.txt + PostgreSQL driver
+-r requirements.txt
+psycopg2-binary>=2.9
+# redis>=5   # only needed when REDIS_URL is set (shared rate-limit counters)

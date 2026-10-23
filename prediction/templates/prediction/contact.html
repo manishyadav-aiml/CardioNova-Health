@@ -1,0 +1,28 @@
+{% extends "prediction/base.html" %}
+{% block title %}Contact - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel narrow-panel">
+  <h1>Contact us</h1>
+  {% if sent %}
+  <div class="form-state form-state-success" role="status" tabindex="-1" id="form-success">
+    <span class="check-mark" aria-hidden="true">&#10003;</span>
+    <div><strong>Thank you, your message was sent.</strong><br><span class="small">We will read it as soon as we can. Please do not send medical emergencies here.</span></div>
+  </div>
+  <p><a href="{% url 'home' %}" class="btn">Back to the home page</a></p>
+  {% else %}
+  <p class="lead">Questions about the project? Write to us{% if CONTACT_EMAIL %} or email <a href="mailto:{{ CONTACT_EMAIL }}">{{ CONTACT_EMAIL }}</a>{% endif %}.</p>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "prediction/_form_errors.html" %}
+    {% for field in form %}
+      {% if field.name == 'website' %}
+        <div class="hp" aria-hidden="true">{{ field.label_tag }} {{ field }}</div>
+      {% else %}
+        {% include "prediction/_field.html" with field=field %}
+      {% endif %}
+    {% endfor %}
+    <button type="submit" class="btn">Send message</button>
+  </form>
+  {% endif %}
+</section>
+{% endblock %}

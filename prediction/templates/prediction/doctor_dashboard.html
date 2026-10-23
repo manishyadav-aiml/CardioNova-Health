@@ -1,0 +1,53 @@
+{% extends "prediction/base.html" %}
+{% load static %}
+{% block title %}Doctor dashboard - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Doctor dashboard</h1>
+  <p class="lead">Patients who chose to share their history with doctors. Predictions you made yourself are in <a href="{% url 'history' %}">My history</a>.</p>
+
+  <div class="stat-row">
+    <div class="stat"><span class="stat-num">{{ total }}</span><span class="small">predictions</span></div>
+    <div class="stat low"><span class="stat-num">{{ counts.LOW }}</span><span class="small">low</span></div>
+    <div class="stat moderate"><span class="stat-num">{{ counts.MODERATE }}</span><span class="small">moderate</span></div>
+    <div class="stat high"><span class="stat-num">{{ counts.HIGH }}</span><span class="small">high</span></div>
+  </div>
+
+  {% if total %}
+  <div class="chart-box narrow"><canvas id="risk-chart" height="160"></canvas></div>
+  <p class="chart-fallback small" hidden>The chart could not be loaded (it needs an internet connection).</p>
+  {{ chart_data|json_script:"risk-data" }}
+  {% endif %}
+
+  <h2>Patients</h2>
+  <form method="get" class="search">
+    <input type="text" name="q" value="{{ q }}" placeholder="Search username" class="form-control">
+    <button type="submit" class="btn btn-small">Search</button>
+  </form>
+  {% if patients %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Patient</th><th>Predictions</th><th>Latest risk</th><th>Latest probability</th><th>Last prediction</th><th></th></tr></thead>
+      <tbody>
+      {% for p in patients %}
+        <tr>
+          <td>{{ p.username }}</td>
+          <td>{{ p.n }}</td>
+          <td><span class="badge badge-{{ p.latest.risk_level|lower }}">{{ p.latest.risk_level }}</span></td>
+          <td>{{ p.latest.probability|floatformat:1 }}%</td>
+          <td>{{ p.last|date:"d M Y, H:i" }}</td>
+          <td><a href="{% url 'doctor_patient' p.pk %}">Open</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p>No patients to show yet.</p>
+  {% endif %}
+</section>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'prediction/js/charts.js' %}"></script>
+{% endblock %}

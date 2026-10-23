@@ -1,0 +1,61 @@
+{% extends "prediction/base.html" %}
+{% load static %}
+{% block title %}History - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  {% if own %}
+    <h1>My prediction history</h1>
+  {% else %}
+    <p><a href="{% url 'doctor_dashboard' %}">&larr; Back to patients</a></p>
+    <h1>Patient: {{ subject.username }}</h1>
+  {% endif %}
+
+  <div class="filters">
+    <a href="?" class="chip {% if not level %}active{% endif %}">All</a>
+    <a href="?level=LOW" class="chip {% if level == 'LOW' %}active{% endif %}">Low</a>
+    <a href="?level=MODERATE" class="chip {% if level == 'MODERATE' %}active{% endif %}">Moderate</a>
+    <a href="?level=HIGH" class="chip {% if level == 'HIGH' %}active{% endif %}">High</a>
+    <span class="small">{{ total }} record(s)</span>
+  </div>
+
+  {% if chart_data %}
+    <h2>Risk trend</h2>
+    <div class="chart-box"><canvas id="history-chart" height="110"></canvas></div>
+    <p class="chart-fallback small" hidden>The chart could not be loaded (it needs an internet connection). The table below has the same data.</p>
+    {{ chart_data|json_script:"chart-data" }}
+  {% endif %}
+
+  {% if page_obj.object_list %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Date</th><th>Label</th><th>Age</th><th>Probability</th><th>Risk level</th><th>Source</th><th></th></tr></thead>
+      <tbody>
+      {% for r in page_obj %}
+        <tr>
+          <td>{{ r.created_at|date:"d M Y, H:i" }}</td>
+          <td>{{ r.patient_label|default:"-" }}</td>
+          <td>{{ r.age }}</td>
+          <td>{{ r.probability|floatformat:1 }}%</td>
+          <td><span class="badge badge-{{ r.risk_level|lower }}">{{ r.risk_level }}</span></td>
+          <td>{{ r.source }}</td>
+          <td><a href="{% url 'result' r.pk %}">View</a>{% if own %}
+            <form method="post" action="{% url 'delete_record' r.pk %}" class="inline-form">{% csrf_token %}<button type="submit" class="link-btn" data-confirm="Delete this prediction permanently?" data-confirm-title="Delete prediction" data-confirm-ok="Delete">Delete</button></form>{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <div class="pagination">
+    {% if page_obj.has_previous %}<a href="?page={{ page_obj.previous_page_number }}{% if level %}&level={{ level }}{% endif %}">&laquo; Previous</a>{% endif %}
+    <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+    {% if page_obj.has_next %}<a href="?page={{ page_obj.next_page_number }}{% if level %}&level={{ level }}{% endif %}">Next &raquo;</a>{% endif %}
+  </div>
+  {% else %}
+    <p>No predictions to show.{% if own %} <a href="{% url 'predict' %}">Make a prediction</a>.{% endif %}</p>
+  {% endif %}
+</section>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="{% static 'prediction/js/charts.js' %}"></script>
+{% endblock %}

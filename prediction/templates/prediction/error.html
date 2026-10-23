@@ -1,0 +1,10 @@
+{% extends "prediction/base.html" %}
+{% block title %}{{ title }} - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel error-page">
+  <p class="error-code">{{ code }}</p>
+  <h1>{{ title }}</h1>
+  <p class="lead">{{ message }}</p>
+  <div class="form-actions"><a href="{% url 'home' %}" class="btn">Go to the home page</a></div>
+</section>
+{% endblock %}

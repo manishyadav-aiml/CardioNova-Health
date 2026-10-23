@@ -1,0 +1,33 @@
+{% extends "prediction/base.html" %}
+{% block title %}Privacy and cookies - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Privacy and cookies</h1>
+  <p class="small">Last updated: {{ SITE_LAST_UPDATED }}. This is a student project; it is not a certified medical service.</p>
+  <h2>Cookies and browser storage</h2>
+  <div class="table-wrap"><table class="table compact">
+    <thead><tr><th>Name</th><th>Purpose</th><th>Kept</th></tr></thead>
+    <tbody>
+      <tr><td><code>sessionid</code> (cookie)</td><td>Keeps you logged in</td><td>Up to 12 hours</td></tr>
+      <tr><td><code>csrftoken</code> (cookie)</td><td>Protects forms against forged requests</td><td>About one year</td></tr>
+      <tr><td><code>theme</code>, <code>cookie-notice</code> (browser storage)</td><td>Remember your light/dark choice and that you saw the cookie notice</td><td>Until you clear your browser data</td></tr>
+    </tbody>
+  </table></div>
+  <p>There are no advertising, analytics or tracking cookies.</p>
+  <h2>Data stored on the server</h2>
+  <ul>
+    <li>Your account (username, email, password as a salted hash).</li>
+    <li>Your predictions: the 13 health values you entered, the result, and an optional label.</li>
+    <li>If you arrived through a link with <code>utm_</code> parameters, the campaign name is saved once on your profile at sign-up. It contains no personal data.</li>
+    <li>Contact messages (name, email, text and a salted hash of your address, not the address itself).</li>
+    <li>An access log of every time a doctor opens your data. You can read it on your account page.</li>
+  </ul>
+  <h2>Your choices</h2>
+  <ul>
+    <li>Switch sharing with doctors off on your account page.</li>
+    <li>Delete single predictions, or your whole account with all predictions, at any time.</li>
+  </ul>
+  <h2>Third parties</h2>
+  <p>The history and doctor pages load the Chart.js library from the jsDelivr content network. Your browser contacts that service to download it, which reveals your IP address to it. Nothing else is loaded from other sites.</p>
+</section>
+{% endblock %}

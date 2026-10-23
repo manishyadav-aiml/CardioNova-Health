@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Django
+db.sqlite3
+db.sqlite3-journal
+*.log
+staticfiles/
+media/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Secrets: never commit real environment files (only .env.example is tracked)
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa*
+*.sqlite3.backup

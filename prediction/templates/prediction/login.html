@@ -1,0 +1,43 @@
+{% extends "prediction/base.html" %}
+
+{% block title %}Login - HeartCare{% endblock %}
+
+{% block content %}
+<section class="auth-box">
+
+  <h1>Login</h1>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+
+    {% include "prediction/_form_errors.html" %}
+
+    {% for field in form %}
+      {% include "prediction/_field.html" with field=field %}
+    {% endfor %}
+
+    <input type="hidden" name="next" value="{{ next }}">
+
+    <div style="text-align: right; margin: 10px 0 18px;">
+      <a href="{% url 'password_reset_request' %}">
+        Forgot your password?
+      </a>
+    </div>
+
+    <button type="submit" class="btn btn-block">
+      Login
+    </button>
+
+  </form>
+
+  <p class="small">
+    After 5 wrong passwords the login is paused for 15 minutes.
+  </p>
+
+  <p class="auth-switch">
+    New here?
+    <a href="{% url 'register' %}">Create an account</a>
+  </p>
+
+</section>
+{% endblock %}

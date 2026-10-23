@@ -1,0 +1,121 @@
+{% extends "prediction/base.html" %}
+{% load l10n static %}
+{% block title %}Result - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel result-panel">
+  <h1>Prediction result</h1>
+  <p class="small">
+    {% if record.patient_label %}Patient: <strong>{{ record.patient_label }}</strong> &middot; {% endif %}
+    {{ record.created_at|date:"d M Y, H:i" }}{% if record.model_name %} &middot; Model: {{ record.model_name }}{% endif %}
+  </p>
+
+  <div class="result-top {{ level_class }}">
+    <div class="result-level">
+      <span class="small">Heart disease risk</span>
+      <span class="level-text">{{ record.risk_level }}</span>
+    </div>
+    <div class="result-prob">
+      <span class="small">Probability</span>
+      <span class="prob-text">{{ record.probability|floatformat:1 }}%</span>
+    </div>
+  </div>
+
+  <div class="gauge" aria-label="Risk probability">
+    <div class="gauge-zone low"></div>
+    <div class="gauge-zone moderate"></div>
+    <div class="gauge-zone high"></div>
+    <div class="gauge-marker" data-left="{{ record.probability|unlocalize }}"></div>
+  </div>
+  <div class="gauge-labels"><span>0%</span><span>30%</span><span>60%</span><span>100%</span></div>
+
+  <p class="advice">{{ advice }}</p>
+  <p class="small">This is a screening aid only and not a medical diagnosis. Risk levels use fixed limits chosen for this project (below 30% low, 30% to below 60% moderate, 60% and above high).</p>
+
+  {% if reliability %}
+  <div class="trust trust-{{ reliability.level }}" id="trust-check">
+    <h2>Trust check: {{ reliability.label }}</h2>
+    <p class="small">New: the system tells you how far <em>this particular</em> estimate can be trusted.</p>
+    <ul>{% for r in reliability.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
+    {% if reliability.range %}<p class="small">The internal cross-validation versions of the model give between <strong>{{ reliability.range.0 }}%</strong> and <strong>{{ reliability.range.1 }}%</strong>.</p>{% endif %}
+    {% if reliability.level == 'low' %}<p><strong>Treat this number with extra caution and discuss it with a doctor.</strong></p>{% endif %}
+  </div>
+  {% endif %}
+
+  {% if factors %}
+  <h2>Main factors in this estimate</h2>
+  <p class="small">Each bar shows how much the patient's value changes the probability compared with the typical (median) value of the training data, in percentage points. Red raises the risk, green lowers it. This is an approximate, model-based explanation, not a medical reason.</p>
+  <div class="factors">
+    {% for f in factors %}
+    <div class="factor">
+      <div class="factor-name">{{ f.label }} <span class="small">({{ f.value }})</span></div>
+      <div class="factor-bar"><div class="bar {% if f.up %}up{% else %}down{% endif %}" data-width="{{ f.width|unlocalize }}"></div></div>
+      <div class="factor-delta {% if f.up %}up{% else %}down{% endif %}">{% if f.delta > 0 %}+{% endif %}{{ f.delta }}</div>
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  <section class="whatif" id="whatif" data-url="{% url 'whatif' record.pk %}" data-before="{{ record.probability|unlocalize }}">
+    <h2>What-if simulator</h2>
+    <p class="small">Move the controls to see how the <em>model's</em> estimate reacts. This shows a statistical association learned from data, not proof that changing a value will change a person's health.</p>
+    <div class="slider-row">
+      <label for="wi-trestbps">Resting blood pressure: <output id="wi-trestbps-out" for="wi-trestbps">{{ record.trestbps }}</output> mm Hg</label>
+      <input type="range" id="wi-trestbps" data-feature="trestbps" data-start="{{ record.trestbps }}" min="{{ ranges.trestbps.0 }}" max="{{ ranges.trestbps.1 }}" step="1" value="{{ record.trestbps }}">
+    </div>
+    <div class="slider-row">
+      <label for="wi-chol">Serum cholesterol: <output id="wi-chol-out" for="wi-chol">{{ record.chol }}</output> mg/dl</label>
+      <input type="range" id="wi-chol" data-feature="chol" data-start="{{ record.chol }}" min="{{ ranges.chol.0 }}" max="{{ ranges.chol.1 }}" step="1" value="{{ record.chol }}">
+    </div>
+    <label class="check"><input type="checkbox" id="wi-fbs" data-feature="fbs" data-start="{{ record.fbs }}" {% if record.fbs %}checked{% endif %}> Fasting blood sugar above 120 mg/dl</label>
+    <div class="whatif-result" id="whatif-result" aria-live="polite">
+      <span class="small">Estimate with the changed values</span>
+      <strong id="wi-after">{{ record.probability|floatformat:1 }}%</strong>
+      <span id="wi-delta" class="wi-delta">no change</span>
+      <span id="wi-level" class="badge badge-{{ level_class }}">{{ record.risk_level }}</span>
+    </div>
+    <div class="error" id="wi-error" role="alert" hidden></div>
+    <button type="button" id="wi-reset" class="btn btn-small btn-outline">Reset to entered values</button>
+  </section>
+
+  {% if scenarios %}
+  <h2>If these values were at commonly cited targets</h2>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Change</th><th>Estimate afterwards</th><th>Difference</th></tr></thead>
+      <tbody>
+      {% for sc in scenarios %}
+        <tr><td>{{ sc.label }}: {{ sc.current }}{% if sc.unit %} {{ sc.unit }}{% endif %} &rarr; {{ sc.target }}{% if sc.unit %} {{ sc.unit }}{% endif %}</td><td>{{ sc.after }}%</td><td>{% if sc.delta > 0 %}+{% endif %}{{ sc.delta }} points</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small">Targets are generally cited values, not personal medical advice.</p>
+  {% endif %}
+
+  <h2>Values entered</h2>
+  <div class="table-wrap">
+    <table class="table">
+      <tbody>
+      {% for label, value in rows %}
+        <tr><th>{{ label }}</th><td>{{ value }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <div class="form-actions no-print">
+    <a href="{% url 'download_report' record.pk %}" class="btn" data-no-loader>Download PDF report</a>
+    <button type="button" class="btn btn-outline" data-copy-text="{{ summary_text }}">Copy summary</button>
+    <button type="button" class="btn btn-outline" data-print>Print</button>
+    <a href="{% url 'predict' %}" class="btn btn-outline">Predict for another patient</a>
+    <a href="{% url 'history' %}" class="btn btn-outline">History</a>
+    {% if is_owner %}
+    <form method="post" action="{% url 'delete_record' record.pk %}" class="inline-form">
+      {% csrf_token %}
+      <button type="submit" class="btn btn-danger" data-confirm="This prediction will be deleted permanently. This cannot be undone." data-confirm-title="Delete prediction" data-confirm-ok="Delete">Delete</button>
+    </form>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}<script src="{% static 'prediction/js/whatif.js' %}"></script>{% endblock %}

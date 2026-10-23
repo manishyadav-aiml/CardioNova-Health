@@ -1,0 +1,17 @@
+{% extends "prediction/base.html" %}
+{% block title %}FAQ - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Frequently asked questions</h1>
+  <p class="lead">Tap a question to open the answer.</p>
+  <div class="faq">
+    {% for question, answer in faq %}
+    <details class="faq-item">
+      <summary>{{ question }}</summary>
+      <p>{{ answer }}</p>
+    </details>
+    {% endfor %}
+  </div>
+  <p>Still have a question? <a href="{% url 'contact' %}">Contact us</a>.</p>
+</section>
+{% endblock %}

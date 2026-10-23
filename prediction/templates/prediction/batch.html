@@ -1,0 +1,51 @@
+{% extends "prediction/base.html" %}
+{% block title %}Batch CSV - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Batch prediction from a CSV file</h1>
+  <p class="lead">Upload a CSV with the 13 columns <code>age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal</code> and an optional <code>label</code> column (patient name or ID). Use the same codes as the single prediction form. Maximum 500 rows.</p>
+  <p><a href="{% url 'batch_template' %}">Download a sample CSV</a></p>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% include "prediction/_form_errors.html" %}
+    {% for field in form %}{% include "prediction/_field.html" with field=field %}{% endfor %}
+    <div class="form-actions">
+      <button type="submit" name="action" value="predict" class="btn">Predict and save to history</button>
+      <button type="submit" name="action" value="download" class="btn btn-outline" data-no-loader>Download results as CSV</button>
+    </div>
+  </form>
+</section>
+
+{% if results is not None %}
+<section class="panel">
+  <h2>Results ({{ results|length }} row{{ results|length|pluralize }})</h2>
+  {% if results %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>#</th><th>Label</th><th>Age</th><th>Probability</th><th>Risk level</th></tr></thead>
+      <tbody>
+      {% for r in results %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ r.label|default:"-" }}</td>
+          <td>{{ r.age|floatformat:0 }}</td>
+          <td>{{ r.probability|floatformat:1 }}%</td>
+          <td><span class="badge badge-{{ r.risk_level|lower }}">{{ r.risk_level }}</span></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if error_count %}
+    <h3>{{ error_count }} row(s) were rejected</h3>
+    <ul class="error-list">
+      {% for row, message in errors %}<li>Row {{ row }}: {{ message }}</li>{% endfor %}
+    </ul>
+    {% if error_count > errors|length %}<p class="small">Only the first {{ errors|length }} problems are shown.</p>{% endif %}
+  {% endif %}
+</section>
+{% endif %}
+{% endblock %}

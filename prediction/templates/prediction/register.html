@@ -1,0 +1,21 @@
+{% extends "prediction/base.html" %}
+{% block title %}Register - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="auth-box">
+  <h1>Create an account</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% include "prediction/_form_errors.html" %}
+    {% for field in form %}
+      <div class="field{% if field.errors %} has-error{% endif %}">
+        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+        {{ field }}
+        {% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+        {% for e in field.errors %}<div class="error" role="alert">{{ e }}</div>{% endfor %}
+      </div>
+    {% endfor %}
+    <button type="submit" class="btn btn-block">Register</button>
+  </form>
+  <p class="auth-switch">Already registered? <a href="{% url 'login' %}">Login</a></p>
+</section>
+{% endblock %}

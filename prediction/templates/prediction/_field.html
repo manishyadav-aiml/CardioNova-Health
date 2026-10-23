@@ -1,0 +1,7 @@
+{# One form field with an error state (red border, message, aria-invalid). Usage: {% include "prediction/_field.html" with field=field %} #}
+<div class="field{% if field.errors %} has-error{% endif %}">
+  <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+  {{ field }}
+  {% if field.help_text %}<small class="help">{{ field.help_text }}</small>{% endif %}
+  {% for e in field.errors %}<div class="error" role="alert">{{ e }}</div>{% endfor %}
+</div>

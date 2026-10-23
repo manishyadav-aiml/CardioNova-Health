@@ -1,0 +1,83 @@
+{% extends "prediction/base.html" %}
+{% block title %}Profile - Heart Disease Prediction System{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>My account</h1>
+  <p>Username: <strong>{{ user.username }}</strong> &middot; Role: <span class="badge badge-role">{{ profile.get_role_display }}</span></p>
+  {% if profile.role == 'patient' %}
+  <form method="post" class="inline-block">
+    {% csrf_token %}
+    <label class="check"><input type="checkbox" name="share_with_doctors" {% if form.share_with_doctors.value %}checked{% endif %}> {{ form.share_with_doctors.label }}</label>
+    <div class="form-actions"><button type="submit" class="btn btn-small">Save</button></div>
+  </form>
+  <p class="small">Doctors are registered by the administrator. Only users with the Doctor role can see shared histories.</p>
+  {% endif %}
+</section>
+
+{% if profile.role == 'patient' %}
+<section class="panel">
+  <h2>Who looked at my data</h2>
+  {% if access_log %}
+  <p class="small">Every time a doctor opens your data, it is recorded here (latest 20).</p>
+  <div class="table-wrap"><table class="table compact">
+    <thead><tr><th>When</th><th>Doctor</th></tr></thead>
+    <tbody>{% for entry in access_log %}<tr><td>{{ entry.viewed_at|date:"d M Y, H:i" }}</td><td>{{ entry.doctor.username }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}
+  <p>No doctor has opened your data.</p>
+  {% endif %}
+</section>
+{% endif %}
+
+<section class="panel">
+  <h2>API access</h2>
+  <p>Use a personal token to call the JSON API from other programs. Only a hash of the token is stored, so it is shown <strong>once</strong>. Creating a new token invalidates the old one.</p>
+  {% if new_token %}
+    <div class="token-box">
+      <strong>Your new token (copy it now):</strong>
+      <code id="new-token">{{ new_token }}</code>
+      <button type="button" class="btn btn-small" data-copy="#new-token">Copy token</button>
+    </div>
+  {% elif has_token %}
+    <p class="small">You already have a token. Create a new one if you lost it.</p>
+  {% endif %}
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="token">
+    <button type="submit" class="btn btn-small"{% if has_token %} data-confirm="The old token will stop working immediately. Create a new one?" data-confirm-title="Replace API token" data-confirm-ok="Create new token"{% endif %}>{% if has_token %}Generate a new token{% else %}Generate token{% endif %}</button>
+  </form>
+
+  <h3>Endpoints</h3>
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Method and URL</th><th>Purpose</th></tr></thead>
+      <tbody>
+        <tr><td><code>GET /api/health/</code></td><td>Status and model name (no token needed)</td></tr>
+        <tr><td><code>POST /api/predict/</code></td><td>Send the 13 values as JSON, receive probability, risk level, top factors and the trust check. Add <code>"save": true</code> to store it in your history.</td></tr>
+        <tr><td><code>POST /api/whatif/</code></td><td>Send the 13 values plus <code>"changes": {"trestbps": 120, "chol": 200}</code> and receive the estimate before and after.</td></tr>
+        <tr><td><code>GET /api/history/?limit=20</code></td><td>Your latest predictions</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <h3>Example</h3>
+  <pre class="codebox" id="curl-example">curl -X POST {{ request.scheme }}://{{ request.get_host }}/api/predict/ \
+  -H "Authorization: Token YOUR_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"age":60,"sex":1,"cp":4,"trestbps":150,"chol":280,"fbs":1,"restecg":1,
+       "thalach":115,"exang":1,"oldpeak":3.0,"slope":2,"ca":2,"thal":7}'</pre>
+  <button type="button" class="btn btn-small btn-outline" data-copy="#curl-example">Copy example</button>
+</section>
+
+<section class="panel danger-zone">
+  <h2>Delete my account</h2>
+  <p>This permanently deletes your account and <strong>all</strong> your predictions. Enter your password to confirm.</p>
+  <form method="post" action="{% url 'delete_account' %}">
+    {% csrf_token %}
+    <div class="field">
+      <label for="delete-password">Password</label>
+      <input type="password" id="delete-password" name="password" class="form-control" autocomplete="current-password" required>
+    </div>
+    <button type="submit" class="btn btn-danger" data-confirm="Your account and all predictions will be deleted forever." data-confirm-title="Delete account" data-confirm-ok="Delete everything">Delete my account</button>
+  </form>
+</section>
+{% endblock %}
