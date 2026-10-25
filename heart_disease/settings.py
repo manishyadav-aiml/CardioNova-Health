@@ -111,9 +111,9 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     "prediction.security.SecurityHeadersMiddleware",
     "prediction.security.RequestGuardMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "prediction.security.UTMMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -125,8 +125,6 @@ MIDDLEWARE = [
 
 
 ROOT_URLCONF = "heart_disease.urls"
-
-
 # ============================================================
 # TEMPLATES
 # ============================================================

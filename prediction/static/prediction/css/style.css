@@ -331,3 +331,43 @@ body.is-ready main > * { animation: fade-up .35s ease both; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; scroll-behavior: auto !important; }
 }
+/* ==========================================
+   CardioNova Health - Layout spacing fix
+   ========================================== */
+
+/* Keep the main content separated from the footer */
+#main-content {
+    display: flow-root;
+    flex: 1 0 auto;
+    width: 100%;
+    padding-top: 28px;
+    padding-bottom: 40px;
+}
+
+/* Keep footer content properly spaced */
+.footer {
+    position: relative;
+    display: block;
+    width: 100%;
+    margin-top: 24px;
+    padding: 24px 0;
+    line-height: 1.6;
+}
+
+.footer p {
+    margin: 8px 0;
+}
+
+/* Hide the cookie notice when it is dismissed */
+.cookie-banner[hidden] {
+    display: none !important;
+}
+
+/* Position the visible cookie notice correctly */
+.cookie-banner:not([hidden]) {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: 16px;
+    z-index: 2600;
+}
