@@ -1,10 +1,26 @@
-# 🫀 CardioNova Health — Heart Disease Prediction System
+<div align="center">
+
+# 🫀 CardioNova Health
 
 ### An ML-Powered Web Application for Heart Disease Risk Prediction
 
-CardioNova Health is a machine learning-based web application developed to estimate the likelihood of heart disease using structured patient health attributes. Built with Python, Django, and Scikit-learn, the project demonstrates the integration of a machine learning pipeline with a web application.
+**A Machine Learning Project for Healthcare Risk Estimation and Decision Support**
 
-The project covers model training, evaluation, model persistence, web integration, and automated testing. It is designed as a final-year BTech Computer Science and Engineering project and an AI/ML portfolio project.
+<p>
+  <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Django-Web_Framework-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/Machine_Learning-scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Machine Learning">
+</p>
+
+<p>
+  <img src="https://img.shields.io/badge/Project-Final_Year_BTech-blue?style=flat-square" alt="Final Year BTech Project">
+  <img src="https://img.shields.io/badge/Testing-Automated_Tests-success?style=flat-square" alt="Automated Testing">
+  <img src="https://img.shields.io/badge/Focus-Healthcare_ML-purple?style=flat-square" alt="Healthcare Machine Learning">
+</p>
+
+**Building machine learning solutions for healthcare research and education.**
+
+</div>
 
 > **Medical Disclaimer:** This application is intended for educational and research demonstration purposes only. It is not a medical device, does not provide a clinical diagnosis, and must not be used as a substitute for professional medical advice.
 
