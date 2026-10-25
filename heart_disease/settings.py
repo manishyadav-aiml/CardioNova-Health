@@ -52,7 +52,7 @@ DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 if not SECRET_KEY:
-    if not DEBUG:
+    if not DEBUG: 
         raise ImproperlyConfigured(
             "Set DJANGO_SECRET_KEY when DJANGO_DEBUG=0."
         )
@@ -74,7 +74,7 @@ elif not DEBUG and (
 
 ALLOWED_HOSTS = env_list(
     "DJANGO_ALLOWED_HOSTS",
-    "127.0.0.1,localhost,[::1]",
+    "127.0.0.1,localhost,[::1],testserver",
 )
 
 CSRF_TRUSTED_ORIGINS = env_list(
@@ -296,6 +296,9 @@ if not DEBUG:
         if _ssl
         else 0
     )
+
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = False
+    SECURE_HSTS_PRELOAD = False
 
 
 # ============================================================
