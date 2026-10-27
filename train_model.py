@@ -1,4 +1,4 @@
-"""
+﻿"""
 Trains, tunes, compares, calibrates and evaluates the heart disease models.
 
     python train_model.py            full hyper-parameter search (about 1-3 minutes)
@@ -10,7 +10,7 @@ Steps
   3. Tune 6 models with GridSearchCV (5-fold stratified CV, ROC-AUC)
   4. Build two ensembles (soft Voting and Stacking) from the tuned models
   5. Select the model with the best cross-validation ROC-AUC (training data only)
-  6. Calibrate the probabilities (sigmoid) if that lowers the cross-validated Brier score
+  6. Calibrate the probabilities (sigmoid, 5-fold); the fold models also feed the app's trust check
   7. Evaluate once on the untouched test set and on every external dataset
   8. Compute permutation feature importance and the baseline used for explanations
   9. Save model files, charts for the web app and model/model_info.json
@@ -47,6 +47,7 @@ from sklearn.svm import SVC  # noqa: E402
 from sklearn.tree import DecisionTreeClassifier  # noqa: E402
 
 from ml_pipeline.data import FEATURES, load_dataset  # noqa: E402
+from prediction.ml import LOW_LIMIT  # noqa: E402  (the app's LOW/MODERATE limit; no Django needed)
 
 warnings.filterwarnings("ignore")
 
@@ -101,6 +102,24 @@ def metrics_for(y_true, prob, threshold=0.5):
     return {k: (round(float(v), 3) if v is not None else None) for k, v in out.items()}
 
 
+def bootstrap_ci(y_true, prob, threshold=0.5, n_boot=2000, seed=SEED):
+    """95% bootstrap intervals for the test-set metrics (the test set is small, so single numbers can mislead)."""
+    rng = np.random.default_rng(seed)
+    y_true, prob = np.asarray(y_true), np.asarray(prob)
+    pred = (prob >= threshold).astype(int)
+    samples = {"accuracy": [], "precision": [], "recall": [], "roc_auc": []}
+    for _ in range(n_boot):
+        idx = rng.integers(0, len(y_true), len(y_true))
+        yt = y_true[idx]
+        if yt.min() == yt.max():
+            continue
+        samples["accuracy"].append(accuracy_score(yt, pred[idx]))
+        samples["precision"].append(precision_score(yt, pred[idx], zero_division=0))
+        samples["recall"].append(recall_score(yt, pred[idx], zero_division=0))
+        samples["roc_auc"].append(roc_auc_score(yt, prob[idx]))
+    return {k: [round(float(np.percentile(v, 2.5)), 3), round(float(np.percentile(v, 97.5)), 3)] for k, v in samples.items()}
+
+
 def main(quick):
     print("Loading", DATASET)
     X, y = load_dataset(DATASET, drop_missing=True)
@@ -150,24 +169,50 @@ def main(quick):
     print("\nSelected model:", best_name)
     best_pipe = tuned[best_name]
     prep = best_pipe.named_steps["prep"]
-    X_train_t, X_test_t = prep.transform(X_train), prep.transform(X_test)
     base_clf = best_pipe.named_steps["clf"]
 
-    # ---- 6. probability calibration
-    raw_brier = -cross_val_score(clone(base_clf), X_train_t, y_train, cv=cv, scoring="neg_brier_score").mean()
-    calibrated = CalibratedClassifierCV(clone(base_clf), method="sigmoid", cv=5)
-    cal_brier = -cross_val_score(calibrated, X_train_t, y_train, cv=cv, scoring="neg_brier_score").mean()
+    # Keep preprocessing inside each calibration CV fold to prevent leakage.
+    calibration_pipe = Pipeline([
+        ("prep", preprocessor()),
+        ("clf", clone(base_clf)),
+    ])
+    raw_brier = -cross_val_score(
+        clone(calibration_pipe), X_train, y_train,
+        cv=cv, scoring="neg_brier_score"
+    ).mean()
+    calibrated = CalibratedClassifierCV(
+        clone(calibration_pipe), method="sigmoid", cv=5
+    )
+    cal_brier = -cross_val_score(
+        calibrated, X_train, y_train,
+        cv=cv, scoring="neg_brier_score"
+    ).mean()
+
+    # Select calibration only when it improves the cross-validation Brier score.
     use_cal = cal_brier < raw_brier
-    final_model = (CalibratedClassifierCV(clone(base_clf), method="sigmoid", cv=5).fit(X_train_t, y_train)
-                   if use_cal else base_clf)
+    if use_cal:
+        final_model = CalibratedClassifierCV(
+            clone(calibration_pipe), method="sigmoid", cv=5
+        ).fit(X_train, y_train)
+    else:
+        final_model = clone(calibration_pipe).fit(X_train, y_train)
     print(f"CV Brier score: raw {raw_brier:.4f}  calibrated {cal_brier:.4f}  -> "
           f"{'calibrated' if use_cal else 'raw'} model used")
 
     # ---- 7. final evaluation
-    final_prob = final_model.predict_proba(X_test_t)[:, 1]
+    final_prob = final_model.predict_proba(X_test)[:, 1]
     final_metrics = metrics_for(y_test, final_prob)
     tn, fp, fn, tp = confusion_matrix(y_test, (final_prob >= 0.5).astype(int)).ravel()
     print("Test-set metrics:", final_metrics)
+    metrics_ci = bootstrap_ci(y_test, final_prob)
+    print("95% bootstrap intervals:", metrics_ci)
+    # The app treats everything at or above its own LOW limit as "not low". The limit is fixed in advance
+    # (it is NOT tuned on the test set); this shows what that choice means for recall.
+    low_metrics = metrics_for(y_test, final_prob, threshold=LOW_LIMIT)
+    ltn, lfp, lfn, ltp = confusion_matrix(y_test, (final_prob >= LOW_LIMIT).astype(int)).ravel()
+    at_low_limit = {"threshold": LOW_LIMIT, "metrics": low_metrics,
+                    "confusion": {"tn": int(ltn), "fp": int(lfp), "fn": int(lfn), "tp": int(ltp)}}
+    print(f"At the app's LOW limit ({LOW_LIMIT}):", low_metrics)
 
     external = {}
     for path in sorted(list(EXTERNAL_DIR.glob("*.csv")) + list(EXTERNAL_DIR.glob("*.data"))):
@@ -176,7 +221,7 @@ def main(quick):
         except ValueError as exc:
             print("Skipping", path.name, "-", exc)
             continue
-        prob = final_model.predict_proba(prep.transform(Xe))[:, 1]
+        prob = final_model.predict_proba(Xe)[:, 1]
         m = metrics_for(ye, prob)
         m["rows"] = int(len(Xe))
         m["positive_rate"] = round(float(ye.mean()), 3)
@@ -185,7 +230,7 @@ def main(quick):
         print(f"External {path.name}: {m}")
 
     # ---- 8. feature importance and explanation baseline
-    perm = permutation_importance(final_model, X_test_t, y_test, scoring="roc_auc",
+    perm = permutation_importance(final_model, X_test, y_test, scoring="roc_auc",
                                   n_repeats=20, random_state=SEED)
     raw_imp = np.clip(perm.importances_mean, 0, None)
     share = raw_imp / raw_imp.sum() * 100 if raw_imp.sum() > 0 else raw_imp
@@ -266,6 +311,8 @@ def main(quick):
                         **r["test"]} for n, r in sorted(results.items(), key=lambda kv: -kv[1]["cv_roc_auc"])],
         "metrics": final_metrics,
         "confusion": {"tn": int(tn), "fp": int(fp), "fn": int(fn), "tp": int(tp)},
+        "metrics_ci": metrics_ci,
+        "at_low_limit": at_low_limit,
         "external_validation": external,
         "feature_importance": importance,
         "baseline": baseline,
@@ -277,6 +324,8 @@ def main(quick):
     }
     (MODEL_DIR / "model_info.json").write_text(json.dumps(info, indent=2), encoding="utf-8")
     print("\nSaved model files in", MODEL_DIR, "and charts in", REPORT_DIR)
+    if not info["external_validation"]:
+        print("NOTE: no external validation files found. Run  python scripts/fetch_uci_external.py  and train again.")
     if info["demo_data"]:
         print("NOTE: DEMO_DATA.txt exists, so the model was trained on synthetic demo data.")
 

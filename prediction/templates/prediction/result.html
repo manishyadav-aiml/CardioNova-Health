@@ -1,6 +1,6 @@
 {% extends "prediction/base.html" %}
 {% load l10n static %}
-{% block title %}Result - Heart Disease Prediction System{% endblock %}
+{% block title %}Result - CardioNova Health{% endblock %}
 {% block content %}
 <section class="panel result-panel">
   <h1>Prediction result</h1>
@@ -34,11 +34,22 @@
   {% if reliability %}
   <div class="trust trust-{{ reliability.level }}" id="trust-check">
     <h2>Trust check: {{ reliability.label }}</h2>
-    <p class="small">New: the system tells you how far <em>this particular</em> estimate can be trusted.</p>
+    <p class="small">How far <em>this particular</em> estimate can be trusted.</p>
     <ul>{% for r in reliability.reasons %}<li>{{ r }}</li>{% endfor %}</ul>
-    {% if reliability.range %}<p class="small">The internal cross-validation versions of the model give between <strong>{{ reliability.range.0 }}%</strong> and <strong>{{ reliability.range.1 }}%</strong>.</p>{% endif %}
+    {% if reliability.range %}<p class="small">The cross-validation fold versions of the model give between <strong>{{ reliability.range.0 }}%</strong> and <strong>{{ reliability.range.1 }}%</strong>.</p>{% endif %}
     {% if reliability.level == 'low' %}<p><strong>Treat this number with extra caution and discuss it with a doctor.</strong></p>{% endif %}
   </div>
+  {% endif %}
+
+  {% if narrative %}
+  <section class="summary-card" id="plain-summary">
+    <h2>Plain-language summary</h2>
+    <p>{{ narrative.summary }}</p>
+    <ul>{% for p in narrative.points %}<li>{{ p }}</li>{% endfor %}</ul>
+    <h3>Questions you could ask a doctor</h3>
+    <ul>{% for q in narrative.questions %}<li>{{ q }}</li>{% endfor %}</ul>
+    <p class="small">Written on this server from the model's output using fixed rules; nothing is sent to an outside service. It describes the model's estimate, not your health.</p>
+  </section>
   {% endif %}
 
   {% if factors %}

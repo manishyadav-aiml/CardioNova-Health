@@ -379,6 +379,7 @@ class SecuritySettingsTests(FreshCacheTestCase):
 
     def test_05_doctor_views_are_logged_for_the_patient(self):
         patient, doctor = make_user("pat"), make_user("drhouse", doctor=True)
+        Profile.objects.filter(user=patient).update(share_with_doctors=True)             # sharing is opt-in
         record = make_record(patient)
         self.client.login(username="drhouse", password=PASSWORD)
         self.client.get(reverse("doctor_patient", args=[patient.pk]))

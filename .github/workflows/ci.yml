@@ -8,6 +8,8 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    env:
+      DJANGO_DEBUG: "1"          # development mode for makemigrations / tests; the deploy check below overrides it
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

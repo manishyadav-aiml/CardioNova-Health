@@ -155,13 +155,14 @@ def result(request, pk):
         scenarios = ml.target_scenarios(_values(record))
     except ml.ModelNotAvailable:
         trust, scenarios = None, []
+    narrative = ml.narrative(record.probability, record.risk_level, list(record.explanation or []), trust)
     summary = (f"Heart disease risk: {record.risk_level} ({record.probability:.1f}%). "
                f"Trust check: {trust['label'] if trust else 'not available'}. "
                "Screening aid only, not a diagnosis.")
     context = {
         "record": record, "rows": describe(record), "advice": ADVICE[record.risk_level],
         "level_class": record.risk_level.lower(), "factors": factors,
-        "reliability": trust, "scenarios": scenarios, "summary_text": summary,
+        "reliability": trust, "scenarios": scenarios, "summary_text": summary, "narrative": narrative,
         "ranges": {"trestbps": ml.NUMERIC_RANGES["trestbps"], "chol": ml.NUMERIC_RANGES["chol"]},
         "is_owner": record.user_id == request.user.id,
     }
@@ -207,7 +208,8 @@ def download_report(request, pk):
         trust = ml.reliability(_values(record))
     except ml.ModelNotAvailable:
         trust = None
-    pdf = report.build_report(record, describe(record), record.user.username, ADVICE[record.risk_level], trust)
+    narrative = ml.narrative(record.probability, record.risk_level, list(record.explanation or []), trust)
+    pdf = report.build_report(record, describe(record), record.user.username, ADVICE[record.risk_level], trust, narrative)
     response = HttpResponse(pdf, content_type="application/pdf")
     response["Content-Disposition"] = f'attachment; filename="heart_risk_report_{record.pk}.pdf"'
     return response

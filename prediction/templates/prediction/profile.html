@@ -1,5 +1,5 @@
 {% extends "prediction/base.html" %}
-{% block title %}Profile - Heart Disease Prediction System{% endblock %}
+{% block title %}Profile - CardioNova Health{% endblock %}
 {% block content %}
 <section class="panel">
   <h1>My account</h1>
@@ -10,7 +10,7 @@
     <label class="check"><input type="checkbox" name="share_with_doctors" {% if form.share_with_doctors.value %}checked{% endif %}> {{ form.share_with_doctors.label }}</label>
     <div class="form-actions"><button type="submit" class="btn btn-small">Save</button></div>
   </form>
-  <p class="small">Doctors are registered by the administrator. Only users with the Doctor role can see shared histories.</p>
+  <p class="small">Doctors are registered by the administrator. Only users with the Doctor role can see shared histories. Sharing is off until you switch it on.</p>
   {% endif %}
 </section>
 

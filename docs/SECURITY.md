@@ -29,3 +29,11 @@ The app stores health values, so the main risks are: someone reading another per
 - The ML model is a pickle/joblib file. Only load model files you trained yourself.
 - No email verification and no two-factor login. Both would be good next steps.
 - Passwords are protected by Django's PBKDF2 hashing; the app never sees or logs them.
+
+
+## Changes in v3
+- Doctor sharing is opt-in and off by default; doctors see only patients who switched it on, and every doctor view is logged for the patient.
+- Rate limits for password reset use `security.client_ip()` (honours `DJANGO_TRUSTED_PROXIES`); the e-mail-link reset is limited too.
+- `DJANGO_DEBUG` defaults to `0`. The container runs as a non-root user.
+- Open item: Chart.js is loaded from jsDelivr. Pin it with Subresource Integrity or self-host it, then remove the CDN from the CSP in `prediction/security.py`.
+  Hash: `curl -s https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js | openssl dgst -sha384 -binary | openssl base64 -A`, then add `integrity="sha384-<hash>" crossorigin="anonymous"` to the two `<script>` tags in `history.html` and `doctor_dashboard.html`.

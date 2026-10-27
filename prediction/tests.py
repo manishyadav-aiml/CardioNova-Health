@@ -117,6 +117,7 @@ class PredictionFlowTests(TestCase):
 class DoctorTests(TestCase):
     def setUp(self):
         self.patient = make_user("pat")
+        Profile.objects.filter(user=self.patient).update(share_with_doctors=True)       # sharing is opt-in
         self.doctor = make_user("doc", doctor=True)
         self.client.login(username="pat", password=PASSWORD)
         self.client.post(reverse("predict"), VALID)

@@ -49,18 +49,18 @@ LEVEL_TEXT_COLORS = {
 
 # Contextual notes, not clinical thresholds or personalized advice.
 REFERENCE_INFO = {
-    "age": "Interpret in clinical context",
+    "age": "Risk generally rises with age; interpret in clinical context",
     "sex": "Categorical model input",
     "chest pain": "Categorical model input",
     "resting blood pressure": (
-        "A single systolic value is incomplete; a clinical BP reading normally "
-        "includes systolic and diastolic values"
+        "General guide: below 120/80 mm Hg is considered normal. A single systolic "
+        "value is incomplete; a BP reading normally has systolic and diastolic values"
     ),
-    "cholesterol": "Interpret with the complete lipid profile and clinical context",
-    "fasting blood sugar": "Depends on the test and clinical context",
-    "blood sugar": "Depends on the test and clinical context",
+    "cholesterol": "General guide: total cholesterol below 200 mg/dl is desirable; interpret with the full lipid profile",
+    "fasting blood sugar": "General guide: fasting glucose below 100 mg/dl is normal; this model input flags values above 120",
+    "blood sugar": "General guide: fasting glucose below 100 mg/dl is normal; this model input flags values above 120",
     "resting ecg": "Requires interpretation by a qualified clinician",
-    "maximum heart rate": "Depends on age, exercise and clinical context",
+    "maximum heart rate": "Rough age guide: 220 minus age; interpret with exercise-test context",
     "exercise-induced angina": "Categorical model input",
     "exercise induced angina": "Categorical model input",
     "st depression": "Requires exercise-test interpretation",
@@ -133,7 +133,7 @@ def _make_table(data, widths, header=True, font_size=7.2, padd=4.5):
     return t
 
 
-def build_report(record, rows, username=None, advice="", reliability=None):
+def build_report(record, rows, username=None, advice="", reliability=None, narrative=None):
     """Return a professionally styled PDF report as bytes.
 
     `username` is accepted for backwards compatibility but intentionally not
@@ -305,6 +305,8 @@ def build_report(record, rows, username=None, advice="", reliability=None):
         "The model generated an estimate from the entered values. "
         "Discuss health concerns and clinical test results with a qualified healthcare professional."
     )
+    if narrative and narrative.get("points"):
+        insights_text += "<br/><br/><b>In plain language:</b> " + " ".join(_s(p) for p in narrative["points"][:2])
     reliability_label = "Not assessed"
     reasons_text = ""
     if reliability:
@@ -368,8 +370,9 @@ def build_report(record, rows, username=None, advice="", reliability=None):
 
     factor_table = _make_table(factor_rows, [3.5*cm, 2.4*cm, 2.6*cm], font_size=6.5, padd=4)
     factor_note = _p(
-        "Model effects describe the explanation method's attribution relative to its baseline. "
-        "They do not establish medical causation or independent clinical risk.",
+        "Each effect is the change in the estimate (percentage points) when that input is replaced by the "
+        "training-data median. Effects need not add up to the total. They do not establish medical causation "
+        "or independent clinical risk.",
         small
     )
     left_column = [

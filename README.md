@@ -1,838 +1,681 @@
 <div align="center">
 
-# 🫀 CardioNova Health
+🫀 CardioNova Health
 
-### An ML-Powered Web Application for Heart Disease Risk Prediction
+Uncertainty-Aware Heart Disease Risk Estimation
 
-**A Machine Learning Project for Healthcare Risk Estimation and Decision Support**
+A Django + scikit-learn web application for healthcare ML education and experimentation
 
 <p>
-  <img src="https://img.shields.io/badge/Python-3.9%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
-  <img src="https://img.shields.io/badge/Django-Web_Framework-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
-  <img src="https://img.shields.io/badge/Machine_Learning-scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Machine Learning">
+  <img src="https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Django-4.2%20to%205.x-092E20?style=for-the-badge&logo=django&logoColor=white" alt="Django">
+  <img src="https://img.shields.io/badge/scikit--learn-1.8-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="scikit-learn">
+  <img src="https://img.shields.io/badge/Automated_Tests-91-success?style=for-the-badge" alt="91 automated tests">
 </p>
 
 <p>
-  <img src="https://img.shields.io/badge/Project-Final_Year_BTech-blue?style=flat-square" alt="Final Year BTech Project">
-  <img src="https://img.shields.io/badge/Testing-Automated_Tests-success?style=flat-square" alt="Automated Testing">
-  <img src="https://img.shields.io/badge/Focus-Healthcare_ML-purple?style=flat-square" alt="Healthcare Machine Learning">
+  <img src="https://img.shields.io/badge/Project-Final--Year%20B.Tech-blue?style=flat-square" alt="Final year BTech project">
+  <img src="https://img.shields.io/badge/Domain-Healthcare%20ML-purple?style=flat-square" alt="Healthcare ML">
+  <img src="https://img.shields.io/badge/Status-Educational%20Project-informational?style=flat-square" alt="Educational project">
 </p>
-
-**Building machine learning solutions for healthcare research and education.**
 
 </div>
 
-> **Medical Disclaimer:** This application is intended for educational and research demonstration purposes only. It is not a medical device, does not provide a clinical diagnosis, and must not be used as a substitute for professional medical advice.
+Medical disclaimer: CardioNova Health is an educational and portfolio project. It is not a medical device, does not diagnose, treat, cure, or prevent disease, and must not be used to make medical decisions. Its outputs are experimental model estimates, not personal clinical risk measurements. Consult a qualified healthcare professional for medical advice.
 
----
+📚 Table of Contents
 
-## 📌 Table of Contents
+Project Overview
 
-1. [Project Overview](#-project-overview)
-2. [Problem Statement](#-problem-statement)
-3. [Project Objectives](#-project-objectives)
-4. [Key Features](#-key-features)
-5. [Technology Stack](#-technology-stack)
-6. [System Architecture](#-system-architecture)
-7. [Machine Learning Workflow](#-machine-learning-workflow)
-8. [Dataset](#-dataset)
-9. [Model Evaluation](#-model-evaluation)
-10. [Model Explainability](#-model-explainability)
-11. [Project Structure](#-project-structure)
-12. [Installation and Setup](#-installation-and-setup)
-13. [Running the Application](#-running-the-application)
-14. [Training the Model](#-training-the-model)
-15. [Running Tests](#-running-tests)
-16. [Security and Privacy](#-security-and-privacy)
-17. [Limitations](#-limitations)
-18. [Future Improvements](#-future-improvements)
-19. [Skills Demonstrated](#-skills-demonstrated)
-20. [Author](#-author)
-21. [License](#-license)
+Problem Statement
 
----
+Objectives
 
-## 📖 Project Overview
+Key Features
 
-Heart disease is a major global health concern. Machine learning provides methods for analyzing structured health data and identifying statistical patterns associated with disease outcomes.
+Technology Stack
 
-CardioNova Health demonstrates how a supervised machine learning model can be integrated into a Django web application to estimate the likelihood of heart disease from supported patient health attributes.
+System Architecture
 
-### Project Information
+Machine Learning Workflow
 
-| Property | Details |
-|---|---|
-| Project Name | CardioNova Health |
-| Project Domain | Healthcare Analytics and Machine Learning |
-| Project Type | Final-Year BTech CSE Project |
-| Application Type | Machine Learning Web Application |
-| Programming Language | Python |
-| Web Framework | Django |
-| Machine Learning Library | Scikit-learn |
-| Selected Model in Latest Recorded Experiment | Random Forest |
-| Development Environment | Visual Studio Code |
-| Version Control | Git and GitHub |
-| Primary Purpose | Academic Project and AI/ML Portfolio |
+Dataset
 
-### Project Goals
+Model Evaluation
 
-- Develop a machine learning pipeline for a healthcare-related classification problem.
-- Compare candidate classification models.
-- Evaluate model performance using appropriate metrics.
-- Integrate a trained model into a Django application.
-- Maintain automated tests for application behavior.
-- Document model limitations and responsible-use considerations.
+Explainability and Prediction Trust
 
----
+Project Structure
 
-## 🎯 Problem Statement
+Installation and Setup
 
-Assessing heart disease risk involves interpreting multiple patient health attributes. This project explores the use of supervised machine learning to identify patterns in a labeled dataset and estimate the likelihood of a heart disease outcome.
+Running the Application
 
-The goal is to build an educational application that demonstrates the complete workflow from data preparation and model training to evaluation and web integration.
+Training and Evaluating the Model
 
-The system is not intended to replace doctors or independently determine whether a person has heart disease.
+Tests and Quality Checks
 
----
+Security and Privacy
 
-## 🎯 Project Objectives
+Limitations
 
-1. Load and prepare a structured heart disease dataset.
-2. Perform data preprocessing appropriate to the selected features.
-3. Train and compare classification algorithms.
-4. Evaluate models using cross-validation and held-out test data.
-5. Investigate probability calibration.
-6. Save trained model artifacts for application use.
-7. Integrate the prediction pipeline with Django.
-8. Test application functionality and security-related behavior.
-9. Document evaluation results, limitations, and possible improvements.
+Future Improvements
 
----
+Skills Demonstrated
 
-## ✨ Key Features
+Academic and Portfolio Relevance
 
-The following features describe the project's core areas. Confirm the current implementation before claiming optional features as completed.
+Author
 
-### 1. Heart Disease Prediction
+License
 
-Uses a trained machine learning model to generate predictions from supported input features.
+📖 Project Overview
 
-### 2. Django Web Application
+CardioNova Health demonstrates an end-to-end machine-learning workflow: preparing a structured dataset, training and evaluating classifiers, persisting the selected model, and integrating inference into a Django web application.
 
-Provides a web interface through which users can interact with the prediction system.
+Unlike a basic demo that only displays a class label, the application includes features intended to make model behaviour easier to inspect: a prediction trust check, a rule-based plain-language summary, feature perturbation explanations, and a what-if simulator. These are software and model-inspection aids—not clinical guarantees.
 
-### 3. Machine Learning Pipeline
+Project Information
 
-Separates model development and training from the web application's prediction workflow.
+Item
 
-### 4. Model Evaluation
+Details
 
-Evaluates the selected model using classification metrics, including accuracy, precision, recall, F1-score, ROC-AUC, and Brier score.
+Project name
 
-### 5. Probability Calibration Experiment
+CardioNova Health
 
-Compares Brier scores before and after calibration to investigate the quality of predicted probabilities.
+Domain
 
-### 6. Model Persistence
+Healthcare analytics and machine learning
 
-Stores trained model artifacts so that the application can load the model without retraining it for every prediction.
+Project type
 
-### 7. Automated Testing
+Final-year B.Tech CSE project and portfolio project
 
-Includes an automated test suite for checking application behavior and selected security-related cases.
+Application
 
-### 8. Security Improvements
+Django web application
 
-Includes changes to password-reset templates that remove unnecessary use of Django's `safe` template filter.
+Language
 
-> Feature availability, exact prediction outputs, and security coverage should be verified against the current source code before making broader claims.
+Python
 
----
+ML library
 
-## 🛠️ Technology Stack
+scikit-learn
 
-| Category | Technology | Purpose |
-|---|---|---|
-| Programming Language | Python | Application and ML development |
-| Web Framework | Django | Server-side web application |
-| Machine Learning | Scikit-learn | Training and evaluating classification models |
-| Data Processing | Pandas | Tabular data processing, where used |
-| Numerical Computing | NumPy | Numerical operations, where used |
-| Model Persistence | Pickle-based artifacts | Saving and loading trained models |
-| Frontend | HTML, CSS, JavaScript | User interface, where implemented |
-| Testing | Django Test Framework and Python tests | Automated testing |
-| IDE | Visual Studio Code | Development environment |
-| Version Control | Git | Source-code management |
-| Repository Hosting | GitHub | Project hosting and version control |
+Data processing
 
-The installed dependency versions should be taken from the project's `requirements.txt` file.
+pandas and NumPy
 
----
+Database/deployment options
 
-## 🏗️ System Architecture
+Django-supported database configuration; PostgreSQL in Docker Compose configuration
 
-The application follows a typical machine learning web-application workflow.
+Development environment
 
-```text
-                   ┌────────────────────────┐
-                   │     User / Browser     │
-                   └────────────┬───────────┘
-                                │
-                                ▼
-                   ┌────────────────────────┐
-                   │    Django Web Layer    │
-                   │ Views and Form Handling│
-                   └────────────┬───────────┘
-                                │
-                                ▼
-                   ┌────────────────────────┐
-                   │   Input Validation     │
-                   │ and Preprocessing      │
-                   └────────────┬───────────┘
-                                │
-                                ▼
-                   ┌────────────────────────┐
-                   │   Trained ML Model     │
-                   │     Random Forest      │
-                   └────────────┬───────────┘
-                                │
-                                ▼
-                   ┌────────────────────────┐
-                   │   Prediction Result    │
-                   └────────────┬───────────┘
-                                │
-                                ▼
-                   ┌────────────────────────┐
-                   │    Django Web Page     │
-                   └────────────────────────┘
-```
+Visual Studio Code
 
-### Architecture Components
+Version control
 
-**Presentation Layer**
+Git and GitHub
 
-Provides the browser-based interface for entering supported information and viewing results.
+🎯 Problem Statement
 
-**Application Layer**
+Structured health datasets contain multiple attributes that can be explored with supervised learning. This project investigates how classification models learn patterns associated with a labelled heart-disease outcome and how a trained model can be exposed through a web application.
 
-Handles HTTP requests, application logic, and communication between the interface and prediction components.
+The goal is to demonstrate a documented ML workflow and responsible presentation of experimental predictions. The system is not designed to replace clinicians, perform diagnosis, or recommend treatment.
 
-**Preprocessing Layer**
+✅ Objectives
 
-Applies the feature transformations expected by the trained model, where required.
+Load and inspect a structured heart-disease dataset.
 
-**Machine Learning Layer**
+Prepare features and target labels consistently.
 
-Loads the persisted model and generates predictions.
+Compare classification models using cross-validation.
 
-**Evaluation Layer**
+Keep preprocessing inside model pipelines to reduce data leakage risk.
 
-Supports the offline training and evaluation process used during model development.
+Evaluate the selected model on a held-out test set.
 
-The diagram is a conceptual overview. The exact implementation should be confirmed against the application's current views, forms, and prediction code.
+Investigate probability calibration and prediction uncertainty indicators.
 
----
+Integrate persisted model artifacts into a Django application.
 
-## 🧠 Machine Learning Workflow
+Provide account-based features and privacy-conscious doctor sharing.
 
-The project follows these general machine learning stages.
+Test application behaviour, access control, validation, and security-related cases.
 
-### Step 1: Data Loading
+Document limitations and avoid unsupported clinical claims.
 
-Load the labeled dataset containing patient health attributes and the target outcome.
+✨ Key Features
 
-### Step 2: Data Inspection
+Prediction and user experience
 
-Inspect the dataset's structure, feature types, target distribution, and data quality.
+Patient registration and login.
 
-### Step 3: Data Preprocessing
+Health-attribute input form and model-generated prediction result.
 
-Prepare the input features for model training. This may include handling missing values, encoding variables, or scaling features as required by the selected model.
+Prediction history with charts.
 
-### Step 4: Data Splitting
+Batch CSV prediction workflow.
 
-Separate the available data into appropriate training and evaluation subsets.
+Downloadable PDF report.
 
-### Step 5: Model Training
+Dark-mode styling, FAQ, contact form, and print stylesheet.
 
-Train candidate classification models using the training data.
+Model transparency
 
-### Step 6: Cross-Validation
+Prediction trust check: combines indicators such as unusual input values, disagreement between fold models, proximity to a risk-band boundary, and data-entry checks. It reports a Good/Fair/Low trust indication and reasons; this is a heuristic, not a statistically validated guarantee.
 
-Evaluate candidate models using cross-validation to obtain a more robust estimate of their performance.
+Plain-language summary: fixed server-side rules turn model outputs into explanatory text and possible questions to discuss with a clinician. No external generative-AI service is required for this summary.
 
-### Step 7: Model Selection
+What-if simulator: re-scores supported changes to selected fields so users can inspect model behaviour. It does not establish medical cause and effect.
 
-Compare model performance using appropriate evaluation metrics.
+Feature perturbation explanation: replaces an input with a training-data reference value and displays the resulting change in model output. This is an explanation of model behaviour, not causation.
 
-### Step 8: Probability Calibration
+Probability calibration experiment: compares calibrated and uncalibrated model probability behaviour.
 
-Compare Brier scores before and after calibration where calibration is supported by the training pipeline.
+Privacy, access, and API
 
-### Step 9: Final Evaluation
+Patient and doctor roles.
 
-Evaluate the selected model on held-out test data.
+Doctor access to patient information is opt-in; access events are logged for patient review.
 
-### Step 10: Model Persistence
+JSON API endpoints for prediction, what-if analysis, and history (/api/predict/, /api/whatif/, /api/history/).
 
-Save the trained model and any required preprocessing artifacts.
+API bearer tokens are stored as hashes rather than plaintext tokens.
 
-### Step 11: Web Integration
+Security and delivery
 
-Load the saved model in the Django application and connect it to the prediction workflow.
+Rate limiting and request/upload size controls.
 
-### Step 12: Automated Testing
+Security headers and Content Security Policy configuration.
 
-Run the test suite to check application behavior and catch regressions.
+CSV formula-injection protections.
 
-### Important Evaluation Principle
+Password-reset flows using OTP and email links.
 
-The held-out test set should not be used repeatedly to choose models, tune hyperparameters, or select calibration settings. Doing so can produce overly optimistic estimates of generalization performance.
+Password-confirmed account deletion flow.
 
----
+Docker configuration, PostgreSQL service configuration, Render blueprint, and GitHub Actions CI workflow.
 
-## 📊 Dataset
+See docs/SECURITY.md and docs/DEPLOYMENT.md for implementation-specific details. A listed feature should be considered verified only after it is checked in the current code and tested in the running application.
 
-The original project documentation identifies the **UCI Heart Disease Cleveland dataset**. Verify the exact source, local dataset file, preprocessing steps, feature definitions, and target encoding against the current training code before final submission.
+🛠️ Technology Stack
 
-### Dataset Summary
+Technology
 
-| Property | Description |
-|---|---|
-| Domain | Healthcare |
-| Data Type | Structured tabular data |
-| Learning Task | Supervised classification |
-| Input | Supported patient health attributes |
-| Target | Heart disease outcome, as defined by the dataset |
-| Records in Latest Recorded Training Run | 297 |
-| Intended Use | Educational machine learning experimentation |
+Purpose
 
-### Dataset Considerations
+Python
 
-- Document the original dataset source.
-- Explain the target variable and its encoding.
-- Identify missing values and explain how they are handled.
-- Document any filtering or preprocessing that changes the record count.
-- Explain how the training, validation, and test sets are created.
-- Avoid describing the dataset as real-time hospital data unless that is verified.
-- Avoid claiming that the dataset represents every patient population.
+Application and ML code
 
-The dataset is relatively small. Therefore, the model's performance may differ when applied to other populations or healthcare settings.
+Django
 
----
+Routing, views, forms, authentication, database integration
 
-## 📈 Model Evaluation
+scikit-learn
 
-The latest recorded local training experiment selected a **Random Forest classifier**.
+Pipelines, model training, cross-validation, calibration, evaluation
 
-The results below reflect the recorded experiment. Re-run the training pipeline and confirm the generated evaluation artifacts before treating these values as the final results for a submission or publication.
+pandas / NumPy
 
-### Cross-Validation Results
+Tabular data processing and numerical operations
 
-| Metric | Recorded Result |
-|---|---:|
-| ROC-AUC | 0.889 |
-| Brier Score Before Calibration | 0.1405 |
-| Brier Score After Calibration | 0.1349 |
+joblib / pickle-based artifacts
 
-The lower Brier score after calibration indicates improved probability-error performance in the recorded experiment. It does not, by itself, establish that individual predictions are clinically reliable.
+Persisting trained estimator and preprocessing artifacts
 
-### Held-Out Test Results
+HTML / CSS / JavaScript
 
-| Metric | Recorded Result |
-|---|---:|
-| Accuracy | 0.833 |
-| Precision | 0.909 |
-| Recall | 0.714 |
-| F1-Score | 0.800 |
-| ROC-AUC | 0.949 |
-| Brier Score | 0.107 |
+Browser interface and interactive components
 
-### Understanding the Evaluation Metrics
+Django test framework
 
-**Accuracy**
+Application and regression tests
 
-The proportion of evaluated predictions that were correct.
+Git / GitHub
 
-**Precision**
+Source control and repository hosting
 
-The proportion of positive predictions that were correct.
+Docker / Docker Compose
 
-**Recall**
+Containerized application and database setup
 
-The proportion of actual positive cases identified by the model.
+GitHub Actions
 
-**F1-Score**
+Automated CI workflow
 
-The harmonic mean of precision and recall.
+The authoritative dependency list is requirements.txt. The committed model artifacts were generated with scikit-learn 1.8.0; use the pinned version when loading them unless the artifacts are retrained and tested with another version.
 
-**ROC-AUC**
+🏗️ System Architecture
 
-Measures how effectively the model ranks positive cases above negative cases across different classification thresholds.
+Browser / User
+      │
+      ▼
+Django URLs, Views, Forms and Authentication
+      │
+      ▼
+Input Validation and Application Rules
+      │
+      ▼
+Saved ML Model + Required Preprocessing Artifacts
+      │
+      ▼
+Prediction, Trust Indicators and Explanations
+      │
+      ▼
+Result Page / History / PDF / API Response
 
-**Brier Score**
+Offline model development:
+Dataset → Data preparation → Train/test split → Cross-validation
+        → Model comparison and calibration → Evaluation → Saved artifacts
 
-Measures the squared difference between predicted probabilities and observed outcomes. Lower values generally indicate better probability predictions on the evaluated data.
+This is a conceptual view. The exact request path and persistence behaviour are defined by the current Django views, forms, model-loading code, and settings.
 
-### Interpretation
+🧠 Machine Learning Workflow
 
-The recorded experiment shows promising classification performance on its evaluation data. However, several factors must be considered:
+Load data: read dataset/heart.csv through the shared loader in ml_pipeline/data.py.
 
-- The dataset is relatively small.
-- Results depend on the evaluation split and class distribution.
-- Precision and recall depend on the decision threshold.
-- A high ROC-AUC does not establish clinical usefulness.
-- Calibration performance should be evaluated on data not used to fit the calibration process.
-- Independent external validation would be required to investigate generalization to other populations.
+Prepare labels: remove duplicate rows and, for the main training dataset, records with missing required values. The target is converted to a binary no-disease/disease label by treating values greater than zero as positive.
 
-**These are experimental machine learning results, not evidence of clinical validation or diagnostic accuracy in real-world medical practice.**
+Split data: the recorded training artifact used 297 usable rows, with a stratified 80/20 split of 237 training rows and 60 test rows.
 
----
+Preprocess in a pipeline: median imputation and standard scaling are fitted as part of the training pipeline, rather than before splitting.
 
-## 🔍 Model Explainability
+Compare models: tune six individual classifiers with GridSearchCV and five-fold stratified cross-validation using ROC-AUC.
 
-Model explainability can help developers investigate which input features influence a model's predictions.
+Compare ensembles: evaluate soft voting and stacking ensembles alongside the individual models.
 
-Possible approaches for a tree-based model include:
+Select a model: select using training cross-validation ROC-AUC, not by selecting whichever model looks best on the held-out test set.
 
-- Feature importance analysis.
-- SHAP-based explanations, if implemented in the current codebase.
-- Controlled feature-perturbation experiments.
-- Reviewing prediction behavior across different input ranges.
+Calibrate and evaluate: apply the configured sigmoid calibration process and evaluate on the held-out test set. The training script also computes bootstrap confidence intervals and permutation feature importance.
 
-An explanation describes aspects of model behavior; it does not establish that a prediction is correct or that a feature causes heart disease.
+Save artifacts: write the model, preprocessing artifact, comparison table, model metadata, and charts used by the web application.
 
-Only describe a particular explainability technique as an implemented feature if its code and output have been verified.
+External evaluation: the training script can evaluate compatible datasets placed in dataset/external/. Results must be interpreted cautiously because dataset completeness, coding, and class distribution may differ.
 
----
+📊 Dataset
 
-## 📂 Project Structure
+The main file is dataset/heart.csv, based on the historical UCI Cleveland heart-disease dataset and its 13 input features. The local file has 303 rows initially; removing duplicate and incomplete records leaves 297 usable records for the recorded experiment.
 
-The following is a representative overview of the repository. Some files and directories may differ in the current version.
+Property
 
-```text
+Description
+
+Task
+
+Supervised binary classification
+
+Input
+
+13 structured clinical attributes encoded in the dataset
+
+Target
+
+Original target values converted to 0 = no disease and 1 = disease present (target > 0)
+
+Usable records in recorded run
+
+297
+
+Training records
+
+237
+
+Held-out test records
+
+60
+
+Intended use
+
+Educational experimentation and portfolio demonstration
+
+External datasets
+
+The project includes scripts/fetch_uci_external.py, which downloads historical UCI processed datasets for Hungary, Switzerland, and the VA site into dataset/external/. These files contain substantial missingness and may have small or highly imbalanced classes. Matching column names does not by itself prove that feature meanings, measurement practices, or category coding are identical across sites.
+
+External validation results are not claimed here. Run the training/evaluation process and inspect model/model_info.json before reporting external metrics. For the Switzerland dataset in particular, very few negative examples make some metrics unstable. Do not describe these datasets as current hospital data or as representative of all populations.
+
+📈 Model Evaluation
+
+The included model/model_info.json and model/model_comparison.csv record an experiment trained on 2026-10-27 with scikit-learn 1.8.0. The selected model in those saved artifacts is Gradient Boosting. These values describe that recorded run; they must be refreshed after retraining before being presented as results from a newer experiment.
+
+Recorded held-out test results
+
+Metric
+
+Recorded result
+
+Accuracy
+
+0.817
+
+Precision
+
+0.870
+
+Recall
+
+0.714
+
+F1-score
+
+0.784
+
+ROC-AUC
+
+0.925
+
+Brier score
+
+0.121
+
+The recorded 95% bootstrap intervals were 0.717–0.917 for accuracy, 0.536–0.885 for recall, and 0.851–0.982 for ROC-AUC. The held-out test set contains only 60 rows, so these estimates have substantial uncertainty.
+
+The recorded experiment also reported recall of 0.929 at the application's 0.30 low/moderate boundary, with precision 0.765. This is a project-defined threshold and must not be interpreted as a clinically established decision threshold.
+
+How to interpret the metrics
+
+Accuracy: fraction of predictions that were correct.
+
+Precision: fraction of positive predictions that were correct.
+
+Recall: fraction of positive-labelled cases identified by the model.
+
+F1-score: harmonic mean of precision and recall.
+
+ROC-AUC: ability to rank positive-labelled cases above negative-labelled cases across thresholds.
+
+Brier score: mean squared error of predicted probabilities; lower is generally better on the evaluated sample.
+
+These metrics do not establish clinical usefulness, diagnostic accuracy in practice, fairness, or safe use with individual patients. A small test set and one historical dataset limit conclusions about generalization.
+
+🔍 Explainability and Prediction Trust
+
+The application provides model-behaviour indicators rather than medical explanations:
+
+Input-range checks: flag values outside reference ranges derived from the training data.
+
+Fold-model disagreement: uses differences among cross-validation fold models as one uncertainty signal.
+
+Boundary proximity: indicates when a probability is close to a project-defined risk-band threshold.
+
+Input consistency checks: flag selected implausible combinations or possible entry errors.
+
+Feature perturbation: compares the prediction with one input replaced by a reference value.
+
+Plain-language summary: explains the model output using fixed server-side rules.
+
+These signals are heuristic. They are not a formal confidence interval, a validated measure of clinical uncertainty, or evidence that an input caused a health outcome.
+
+📂 Project Structure
+
 CardioNova-Health/
-│
-├── heart_disease/
-│   ├── settings.py
-│   ├── urls.py
-│   └── ...
-│
-├── prediction/
-│   ├── migrations/
-│   ├── templates/
-│   │   └── prediction/
-│   ├── static/
-│   │   └── prediction/
-│   ├── tests.py
-│   └── ...
-│
-├── model/
-│   ├── heart_disease_model.pkl
-│   ├── scaler.pkl
-│   ├── model_comparison.csv
-│   ├── model_info.json
-│   └── ...
-│
+├── heart_disease/                 # Django settings, URLs, ASGI/WSGI
+├── prediction/                    # App views, forms, ML logic, templates, tests
+│   ├── migrations/                # Database schema migrations
+│   ├── management/commands/       # Management commands, including doctor setup
+│   ├── static/prediction/         # CSS, JavaScript, charts and report assets
+│   └── templates/prediction/      # HTML templates
+├── ml_pipeline/                   # Shared dataset-loading helpers
 ├── dataset/
-│   └── ...
-│
-├── manage.py
-├── train_model.py
-├── requirements.txt
-├── .gitignore
+│   ├── heart.csv                  # Main dataset
+│   └── external/                  # Optional external evaluation datasets
+├── model/                         # Saved model, preprocessing and metrics
+├── scripts/                       # External dataset fetch and security scan scripts
+├── docs/                          # Security, deployment and project documentation
+├── .github/workflows/ci.yml       # GitHub Actions workflow
+├── train_model.py                 # Model training/evaluation pipeline
+├── manage.py                      # Django management entry point
+├── requirements.txt               # Python dependencies
+├── Dockerfile
+├── docker-compose.yml
+├── render.yaml
 └── README.md
-```
 
-### Important Files
+Generated folders, optional files, or paths may vary by checkout. The actual repository contents are authoritative.
 
-| File or Directory | Purpose |
-|---|---|
-| `manage.py` | Django management commands |
-| `heart_disease/` | Django project configuration |
-| `prediction/` | Prediction application code, templates, tests, and migrations |
-| `model/` | Saved model and related artifacts |
-| `train_model.py` | Model training script, if present at the repository root |
-| `requirements.txt` | Python dependencies |
-| `.gitignore` | Files and directories excluded from Git |
-| `README.md` | Project documentation |
+⚙️ Installation and Setup
 
-Confirm the exact paths in VS Code before using this structure as a definitive file listing.
+Prerequisites
 
----
+A Python version supported by the project's dependency pins (the repository includes .python-version; check it before creating an environment).
 
-## ⚙️ Installation and Setup
+Git and PowerShell on Windows.
 
-Follow these steps to run the project locally on Windows.
+Visual Studio Code or another code editor.
 
-### Prerequisites
+1. Clone the repository
 
-Install the following:
-
-- Python version compatible with the project's dependencies.
-- Git.
-- Visual Studio Code.
-- PowerShell or another terminal.
-
-### Step 1: Clone the Repository
-
-Open PowerShell and run:
-
-```powershell
 git clone https://github.com/manishyadav-aiml/CardioNova-Health.git
-```
-
-Move into the project directory:
-
-```powershell
 cd CardioNova-Health
-```
 
-### Step 2: Create a Virtual Environment
+2. Create and activate a virtual environment
 
-```powershell
 python -m venv venv
-```
-
-### Step 3: Activate the Virtual Environment
-
-```powershell
 .\venv\Scripts\Activate.ps1
-```
 
-If PowerShell blocks the activation script, temporarily allow scripts for the current terminal session:
+If PowerShell blocks activation, allow scripts for this terminal session only, then retry:
 
-```powershell
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-```
-
-Then activate the environment again:
-
-```powershell
 .\venv\Scripts\Activate.ps1
-```
 
-### Step 4: Install Dependencies
+3. Install dependencies
 
-Upgrade pip:
-
-```powershell
 python -m pip install --upgrade pip
-```
+python -m pip install -r requirements.txt
 
-Install the project dependencies:
+Use the dependency versions defined by the repository. Model files saved with one scikit-learn version may not be compatible with another version.
 
-```powershell
-pip install -r requirements.txt
-```
+4. Configure environment variables
 
-Use the versions declared in `requirements.txt`. Saved Scikit-learn model artifacts may not be compatible with arbitrary versions of Scikit-learn.
+Review heart_disease/settings.py and .env.example for the variables required by this project. For local development, create a local .env based on the example and set the values needed by your environment. Do not copy example secrets into a public production deployment, and never commit real .env files, passwords, or secret keys.
 
-### Step 5: Configure Environment Variables
+5. Apply migrations and check the project
 
-Check `heart_disease/settings.py` and any environment-variable examples in the repository to determine which configuration values are required.
-
-If the application uses a `.env` file, create one locally and provide the required variables.
-
-For example:
-
-```env
-SECRET_KEY=replace-with-a-secure-local-secret
-DEBUG=True
-```
-
-These are illustrative values, not a complete configuration specification.
-
-**Do not commit `.env` files, production secrets, passwords, or private credentials to GitHub.**
-
-### Step 6: Apply Database Migrations
-
-```powershell
 python manage.py migrate
-```
-
-If this command fails, inspect the migration history and database state before attempting corrective actions. Do not delete your existing database to work around a migration error.
-
-### Step 7: Run Django System Checks
-
-```powershell
 python manage.py check
-```
 
-Resolve any reported configuration or application errors before continuing.
+6. Start the development server
 
----
-
-## ▶️ Running the Application
-
-Start the Django development server:
-
-```powershell
 python manage.py runserver
-```
 
-Open the local address displayed in the terminal. The default is:
+Open http://127.0.0.1:8000/ in your browser. Stop the server with Ctrl+C. Django's built-in server is for development and testing, not production hosting.
 
-```text
-http://127.0.0.1:8000/
-```
+🤖 Training and Evaluating the Model
 
-If the application uses a different route for its main page, navigate to the appropriate URL defined in the project's URL configuration.
+Important: training overwrites files in model/ and generates report charts. Back up the current model artifacts before running it if you need to preserve the previous experiment.
 
-To stop the development server, press:
+Inspect supported options:
 
-```text
-Ctrl + C
-```
-
-### Development Server Notice
-
-Django's built-in development server is intended for local development and testing. It should not be used as the production deployment server.
-
----
-
-## 🤖 Training the Model
-
-The repository includes a model training script.
-
-If the script supports quick training, run:
-
-```powershell
-python train_model.py --quick
-```
-
-To inspect the supported command-line options, run:
-
-```powershell
 python train_model.py --help
-```
 
-Training may update the saved model and evaluation artifacts. Review the generated files and compare the new metrics with the documented results before committing changes.
+Run the full training/evaluation workflow:
 
-### Recommended Training Practices
+python train_model.py
 
-- Use a documented dataset version.
-- Keep preprocessing consistent between training and prediction.
-- Avoid data leakage.
-- Separate model selection from final evaluation.
-- Evaluate multiple relevant metrics.
-- Record the random seed and split strategy where applicable.
-- Preserve reproducible training instructions.
-- Confirm that the model artifacts match the installed library versions.
+Or run the smaller quick search if supported by the current script:
 
----
+python train_model.py --quick
 
-## 🧪 Running Tests
+To download the optional external evaluation datasets:
 
-The latest recorded local test run completed successfully:
+python scripts/fetch_uci_external.py
 
-```text
-Ran 71 tests in 66.308s
+Then rerun training/evaluation to calculate external metrics. Review the terminal output and updated model/model_info.json; do not claim external validation merely because the files were downloaded. Confirm data compatibility and missingness before interpreting results.
 
-OK
-```
+🧪 Tests and Quality Checks
 
-To run the Django test suite:
+The recorded local verification for this project version includes 91 passing tests in python manage.py test prediction, a successful Django system check, and a successful collectstatic run. Rerun the commands below after changing code, dependencies, model artifacts, or templates.
 
-```powershell
-python manage.py test
-```
-
-The test suite should be rerun after significant changes to the application, model integration, templates, database logic, or dependencies.
-
-### Check Migration Consistency
-
-Run:
-
-```powershell
+python manage.py check
+python manage.py test prediction
 python manage.py makemigrations --check --dry-run
-```
+python manage.py collectstatic --noinput
 
-The last recorded check returned:
+The project also contains a GitHub Actions workflow. Passing tests provide evidence about the cases covered by the suite; they do not prove that the application is completely secure or clinically reliable. A fresh-database migration test and deployment-specific checks should be completed before production use.
 
-```text
-No changes detected
-```
+🔐 Security and Privacy
 
-This indicates that Django did not detect new model changes requiring migrations. It does **not** prove that all migrations can be applied successfully to a fresh database.
+Security controls are particularly important because the application handles health-related inputs. The repository includes security-focused implementation and tests, but a checklist or passing test suite is not a guarantee of complete security.
 
-### Fresh-Database Migration Verification
+Keep secret keys, credentials, and local environment files out of version control.
 
-Before deployment:
+Keep production debug mode disabled and configure allowed hosts correctly.
 
-1. Create a separate temporary test database.
-2. Configure a test environment to use that database.
-3. Apply all migrations from the beginning.
-4. Run the application checks and relevant tests.
-5. Verify that the expected database tables exist.
-6. Keep the existing development database unchanged.
+Use HTTPS in deployed environments.
 
-This verification is especially important before describing the project as deployment-ready.
+Validate and limit incoming requests and uploaded files.
 
----
+Apply authentication and authorization checks to protected views and APIs.
 
-## 🔐 Security and Privacy
+Review rate limiting, proxy configuration, session handling, password reset, and account deletion flows.
 
-Security is important for any application that handles health-related information.
+Avoid logging unnecessary personal or health information.
 
-The project includes automated tests and security-related template fixes. However, these measures alone do not prove that the entire application is secure.
+Back up the database before migrations or destructive data operations.
 
-### Recommended Security Practices
+Review docs/SECURITY.md and test the production configuration separately.
 
-- Keep secret keys and credentials outside version control.
-- Disable Django debug mode in production.
-- Configure appropriate allowed hosts.
-- Use HTTPS in a deployed environment.
-- Validate user-submitted input.
-- Apply authentication and authorization checks where required.
-- Avoid exposing sensitive information in logs or error messages.
-- Keep dependencies updated.
-- Review error handling and session management.
-- Test database migrations and backup procedures before deployment.
-- Avoid collecting or retaining unnecessary personal or health information.
+Do not claim HIPAA or other regulatory compliance without a formal assessment that supports the claim.
 
-### Sensitive Information
+Doctor sharing is designed to be opt-in. Verify the actual database state and migration behaviour before assuming that an existing account's preferences have changed automatically.
 
-Never publish real patient records, passwords, secret keys, database credentials, or private configuration files in the public repository.
+⚠️ Limitations
 
-Do not claim regulatory compliance, such as HIPAA compliance, unless the application has been independently assessed and the claim is justified.
+Small dataset: the recorded run used 297 complete records from a historical dataset.
 
----
+Limited representativeness: the dataset does not represent every demographic group, geography, or clinical setting.
 
-## ⚠️ Limitations
+No clinical validation: the model is not established for diagnosis, treatment, or medical decisions.
 
-The project has several limitations that should be considered when interpreting its results.
+Experimental risk bands: the 0.30 and 0.60 boundaries are project-defined, not clinical standards.
 
-### 1. Limited Dataset Size
+Uncertainty indicators are heuristic: they should not be treated as formal guarantees of prediction reliability.
 
-The latest recorded training experiment used 297 records. This is a small dataset for establishing robust performance across diverse populations.
+Explanations are not causal: feature changes describe model response, not the cause of disease.
 
-### 2. Dataset Representativeness
+External data comparability: missingness, small class counts, and differing data collection practices can make cross-site metrics unreliable or hard to compare.
 
-The dataset may not represent all age groups, demographic groups, clinical settings, or patient populations.
+Deployment requires more verification: database migrations, secrets, HTTPS, monitoring, backups, and production configuration need separate review.
 
-### 3. No Established Clinical Validation
+No guarantee of future performance: dataset shift or changed usage patterns may affect model behaviour.
 
-The model has not been established as suitable for clinical diagnosis or treatment decisions.
+🚀 Future Improvements
 
-### 4. Potential Data Bias
+Complete and document careful external-dataset evaluation.
 
-Sampling, measurement, and labeling practices may affect the patterns learned by the model.
+Investigate model performance across age and sex groups, while reporting small-sample limitations.
 
-### 5. Probability Uncertainty
+Add experiment tracking and model versioning.
 
-A probability output is not automatically a clinically meaningful risk estimate. Calibration should be evaluated carefully and independently.
+Improve reproducibility and dataset provenance documentation.
 
-### 6. Generalization
+Review calibration on suitable independent data.
 
-Good results on one test split do not guarantee similar performance on independent external datasets.
+Add drift monitoring if the application is deployed.
 
-### 7. Deployment Readiness
+Consider integrity-pinned or self-hosted frontend dependencies.
 
-Production deployment requires additional verification of database migrations, configuration, security, monitoring, and operational reliability.
+Review multi-factor authentication and operational monitoring.
 
-### 8. Model Maintenance
+Test fresh-database migrations and deployment recovery procedures.
 
-Changes in the data distribution may affect model performance over time. A production system would require monitoring and a documented model-update process.
+Conduct an independent security review before handling real sensitive information.
 
-The application should be treated as an educational machine learning demonstration, not a clinical decision-making system.
+These are proposed improvements, not claims that the features are already implemented.
 
----
+💼 Skills Demonstrated
 
-## 🚀 Future Improvements
+Skill
 
-Potential improvements include:
+Evidence in this project
 
-- Evaluate the model on an independent external dataset.
-- Strengthen the reproducibility of the training pipeline.
-- Document the complete dataset provenance and preprocessing process.
-- Add appropriate model-explainability methods.
-- Improve probability calibration analysis.
-- Evaluate decision thresholds using documented criteria.
-- Add experiment tracking and model versioning.
-- Add continuous integration for automated tests.
-- Improve accessibility and responsive interface design.
-- Document deployment configuration.
-- Add monitoring for input quality and model performance if deployed.
-- Conduct a security review before accepting sensitive information.
-- Verify the complete database migration process against a fresh database.
+Python
 
-These items are proposed future improvements. They should not be interpreted as features already implemented.
+Application logic and model-training scripts
 
----
+Machine learning
 
-## 💼 Skills Demonstrated
+Supervised classification and model comparison
 
-| Skill | Application in the Project |
-|---|---|
-| Python Programming | Building application and machine learning components |
-| Machine Learning | Developing a supervised classification workflow |
-| Scikit-learn | Training and evaluating classification models |
-| Model Evaluation | Interpreting precision, recall, F1-score, ROC-AUC, and Brier score |
-| Data Processing | Preparing structured data for model training |
-| Django | Integrating model functionality into a web application |
-| Model Persistence | Saving and loading trained model artifacts |
-| Software Testing | Running automated tests and investigating failures |
-| Debugging | Resolving dependency and model-compatibility problems |
-| Git and GitHub | Maintaining source control and a public project repository |
-| Responsible AI | Documenting limitations and avoiding unsupported clinical claims |
+scikit-learn
 
----
+Pipelines, cross-validation, calibration, evaluation
 
-## 🎓 Academic and Portfolio Relevance
+Data processing
 
-CardioNova Health is suitable for presentation as a final-year BTech CSE project, provided its implementation, documentation, and evaluation are verified.
+Tabular loading, missing-data handling, target preparation
 
-For academic evaluation, the project can demonstrate:
+Model evaluation
 
-- A defined problem statement.
-- A documented machine learning methodology.
-- Dataset preparation and model evaluation.
-- Web application integration.
-- Automated testing.
-- Discussion of limitations and future work.
+Precision, recall, F1-score, ROC-AUC, Brier score, bootstrap intervals
 
-For an AI/ML portfolio, the strongest evidence includes the reproducible training pipeline, clearly documented evaluation metrics, working application, meaningful tests, and the ability to explain technical decisions.
+Django
 
-A strong project presentation should distinguish implemented functionality from planned improvements and experimental results from clinically validated evidence.
+Web routing, views, forms, authentication and persistence
 
----
+API development
 
-## 👨‍💻 Author
+JSON endpoints and token-based access
 
-**Manish Yadav**
+Software testing
 
-Final-Year BTech Computer Science and Engineering Student
+Automated tests and regression checks
 
-**Areas of Interest**
-- Artificial Intelligence
-- Machine Learning
-- Python Development
-- Data Science
-- Web Application Development
+Application security
 
-### GitHub
+Access controls, request validation, rate limiting and security headers
 
-**Profile:**  
-https://github.com/manishyadav-aiml
+Git and GitHub
 
-**Project Repository:**  
-https://github.com/manishyadav-aiml/CardioNova-Health
+Source control and CI workflow
 
----
+Responsible AI
 
-## 📜 License
+Documenting limits and avoiding unsupported clinical claims
 
-Add the project's applicable license here.
+🎓 Academic and Portfolio Relevance
 
-If the repository does not yet contain a `LICENSE` file, choose an appropriate license before claiming that the project is open source. Do not assume that public availability on GitHub automatically grants permission to reuse the code.
+CardioNova Health can be presented as a final-year B.Tech CSE project when the submitted source code, model artifacts, report, and demonstration are consistent with the claims in this README.
 
----
+For an academic viva or technical interview, be ready to explain:
 
-## ⚖️ Disclaimer
+Why this dataset and target encoding were selected.
 
-CardioNova Health is an educational and portfolio project. It is not intended to diagnose, treat, cure, or prevent any disease.
+How the training/test split and cross-validation work.
 
-Predictions generated by this application must not be used as the sole basis for medical decisions. Always consult a qualified healthcare professional for medical evaluation and advice.
+Why preprocessing belongs inside the pipeline.
 
-The reported model metrics are experimental results from a limited dataset. They do not establish clinical effectiveness, safety, or generalization to real-world medical populations.
+Why ROC-AUC, recall, precision, and Brier score provide different information.
+
+What calibration does—and what it does not prove.
+
+How Django loads the model and validates input.
+
+How authentication, role-based access, opt-in sharing, and tests work.
+
+Why the project must not be used as a clinical diagnostic tool.
+
+A strong presentation distinguishes implemented features from planned work and reports only metrics that can be reproduced from the saved artifacts and training code.
+
+👨‍💻 Author
+
+Manish Kumar Yadav
+Final-year B.Tech Computer Science and Engineering (AI/ML) student
+
+GitHub profile: https://github.com/manishyadav-aiml
+
+Project repository: https://github.com/manishyadav-aiml/CardioNova-Health
+
+📜 License
+
+Check whether the repository contains a root-level LICENSE file before describing the project as open source. If no license exists, choose and add an appropriate license before granting reuse permissions. Public availability on GitHub does not automatically grant permission to reuse the code.
+
+⚖️ Final Disclaimer
+
+CardioNova Health is an educational machine-learning demonstration. It is not intended to diagnose, treat, cure, or prevent disease. Its outputs must not be used as the sole basis for medical decisions. Reported metrics are experimental results from a limited dataset and do not establish clinical effectiveness, safety, or generalization to real-world medical populations.

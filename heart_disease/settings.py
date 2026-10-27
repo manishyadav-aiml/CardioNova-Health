@@ -1,5 +1,5 @@
 """
-Django settings for the Heart Disease Prediction System.
+Django settings for CardioNova Health.
 
 Works out of the box for local development. For deployment set the environment
 variables listed in .env.example (DJANGO_SECRET_KEY, DJANGO_DEBUG=0, DATABASE_URL, ...).
@@ -47,14 +47,15 @@ def env_list(name, default=""):
 # CORE SETTINGS
 # ============================================================
 
-DEBUG = os.environ.get("DJANGO_DEBUG", "1") == "1"
+DEBUG = os.environ.get("DJANGO_DEBUG", "0") == "1"      # safe default: off
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "")
 
 if not SECRET_KEY:
     if not DEBUG: 
         raise ImproperlyConfigured(
-            "Set DJANGO_SECRET_KEY when DJANGO_DEBUG=0."
+            "Set DJANGO_SECRET_KEY when DJANGO_DEBUG=0. For local development "
+            "set DJANGO_DEBUG=1 in your environment or .env file."
         )
 
     SECRET_KEY = secrets.token_urlsafe(50)
@@ -465,6 +466,7 @@ RATE_LIMITS = {
     "whatif": (120, 60),
     "admin_login": (15, 900),
     "delete_account": (5, 3600),
+    "password_reset_link": (5, 3600),
 }
 
 
@@ -502,6 +504,6 @@ else:
             "BACKEND": (
                 "django.core.cache.backends.locmem.LocMemCache"
             ),
-            "LOCATION": "heartcare",
+            "LOCATION": "cardionova",
         }
     }

@@ -1,6 +1,6 @@
 {% extends "prediction/base.html" %}
 {% load static %}
-{% block title %}Model details - Heart Disease Prediction System{% endblock %}
+{% block title %}Model details - CardioNova Health{% endblock %}
 {% block content %}
 <section class="panel">
   <h1>Model details and evaluation</h1>
@@ -9,8 +9,8 @@
   {% else %}
   <p>
     Selected model: <strong>{{ info.best_model }}</strong>.
-    {% if info.calibrated %}Probabilities were <strong>calibrated</strong> (sigmoid) because this lowered the cross-validated Brier score ({{ info.brier_cv.raw }} &rarr; {{ info.brier_cv.calibrated }}).
-    {% else %}Calibration did not improve the cross-validated Brier score ({{ info.brier_cv.raw }} vs {{ info.brier_cv.calibrated }}), so the raw model is used.{% endif %}
+    {% if info.calibrated %}Probabilities were <strong>calibrated</strong> (sigmoid, 5-fold cross-validation; cross-validated Brier score {{ info.brier_cv.raw }} before, {{ info.brier_cv.calibrated }} after). The fold models also feed the trust check.
+    {% else %}The raw model is used (cross-validated Brier score {{ info.brier_cv.raw }}; calibrated {{ info.brier_cv.calibrated }}).{% endif %}
     Trained on {{ info.train_rows }} records and tested once on {{ info.test_rows }} unseen records
     (class 0: {{ info.class_counts.0 }}, class 1: {{ info.class_counts.1 }}). Trained {{ info.trained_at }} with scikit-learn {{ info.scikit_learn }}{% if info.quick_mode %} (quick mode){% endif %}.
   </p>
@@ -39,7 +39,19 @@
     <div class="stat"><span class="stat-num">{{ info.metrics.f1 }}</span><span class="small">F1-score</span></div>
     <div class="stat"><span class="stat-num">{{ info.metrics.roc_auc }}</span><span class="small">ROC-AUC</span></div>
   </div>
-  <p class="small">Confusion matrix: TN {{ info.confusion.tn }}, FP {{ info.confusion.fp }}, FN {{ info.confusion.fn }}, TP {{ info.confusion.tp }}. Recall matters most here because a missed patient is the most serious error.</p>
+  {% if info.metrics_ci %}
+  <p class="small">95% bootstrap intervals (the test set has only {{ info.test_rows }} records, so single numbers can mislead):
+    accuracy {{ info.metrics_ci.accuracy.0 }} to {{ info.metrics_ci.accuracy.1 }},
+    precision {{ info.metrics_ci.precision.0 }} to {{ info.metrics_ci.precision.1 }},
+    recall {{ info.metrics_ci.recall.0 }} to {{ info.metrics_ci.recall.1 }},
+    ROC-AUC {{ info.metrics_ci.roc_auc.0 }} to {{ info.metrics_ci.roc_auc.1 }}.</p>
+  {% endif %}
+  <p class="small">Confusion matrix at the usual 50% cut-off: TN {{ info.confusion.tn }}, FP {{ info.confusion.fp }}, FN {{ info.confusion.fn }}, TP {{ info.confusion.tp }}.</p>
+  {% if info.at_low_limit %}
+  <p class="small">A missed patient is the most serious error, so the app does not use 50% as its alarm line: anything at or above its own LOW/MODERATE limit ({{ info.at_low_limit.threshold }}) counts as "not low".
+    At that limit the test-set recall is <strong>{{ info.at_low_limit.metrics.recall }}</strong> (precision {{ info.at_low_limit.metrics.precision }}; TN {{ info.at_low_limit.confusion.tn }}, FP {{ info.at_low_limit.confusion.fp }}, FN {{ info.at_low_limit.confusion.fn }}, TP {{ info.at_low_limit.confusion.tp }}).
+    The limit was fixed in advance and not tuned on the test set.</p>
+  {% endif %}
 
   <h2>External validation</h2>
   {% if info.external_validation %}
@@ -68,6 +80,19 @@
       <div class="factor-delta">{{ f.importance }}%</div>
     </div>
     {% endfor %}
+  </div>
+
+  <h2>Model card</h2>
+  <div class="table-wrap">
+    <table class="table compact">
+      <tbody>
+        <tr><th>Intended use</th><td>Education and demonstration of an uncertainty-aware ML workflow. Not a medical device.</td></tr>
+        <tr><th>Not intended for</th><td>Diagnosis, treatment decisions, triage, or use on patients.</td></tr>
+        <tr><th>Training data</th><td>UCI Cleveland heart disease data, {{ info.rows }} complete records, 13 attributes, target converted to disease / no disease.</td></tr>
+        <tr><th>Known limits</th><td>Small, single-site, mostly older patients, historical data. Inputs outside the training range are flagged by the trust check.</td></tr>
+        <tr><th>Explanations</th><td>Median-replacement ablation: each input is swapped for the training median and the change in probability is shown. Associations, not causes.</td></tr>
+      </tbody>
+    </table>
   </div>
 
   <h2>Charts</h2>

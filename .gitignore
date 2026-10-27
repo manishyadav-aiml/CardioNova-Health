@@ -29,3 +29,5 @@ Thumbs.db
 *.key
 id_rsa*
 *.sqlite3.backup
+# Local model backups - never upload
+model_backup_*/

@@ -14,7 +14,7 @@ class Profile(models.Model):
 
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="profile")
     role = models.CharField(max_length=10, choices=ROLE_CHOICES, default=ROLE_PATIENT)
-    share_with_doctors = models.BooleanField(default=True)
+    share_with_doctors = models.BooleanField(default=False)     # opt-in: nobody is shared until the patient agrees
     api_token_hash = models.CharField(max_length=64, blank=True, db_index=True)
     # First-touch campaign data (UTM parameters) saved at registration; contains no personal data.
     utm_source = models.CharField(max_length=100, blank=True)

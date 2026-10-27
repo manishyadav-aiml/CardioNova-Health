@@ -12,7 +12,7 @@ This project is ready for deployment: it uses **gunicorn** (web server), **White
 | Variable | Required | Meaning |
 |---|---|---|
 | `DJANGO_SECRET_KEY` | yes (production) | Long random string. The app refuses to start without it when `DJANGO_DEBUG=0` |
-| `DJANGO_DEBUG` | yes | `0` for production, `1` (default) for local development |
+| `DJANGO_DEBUG` | no | Default `0` (safe). `manage.py` turns it on only for a plain local checkout (no `.env`, secret key, debug flag or `DATABASE_URL`); otherwise set `1` yourself for local work |
 | `DJANGO_ALLOWED_HOSTS` | yes | Comma-separated host names, e.g. `myapp.onrender.com` |
 | `DJANGO_CSRF_TRUSTED_ORIGINS` | yes | Comma-separated origins with scheme, e.g. `https://myapp.onrender.com` |
 | `DATABASE_URL` | recommended | PostgreSQL URL. SQLite is used when it is not set (data is lost on most free hosts) |

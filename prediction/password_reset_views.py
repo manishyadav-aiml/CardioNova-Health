@@ -6,18 +6,22 @@ import time
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.auth import views as auth_views
 from django.contrib.auth.forms import SetPasswordForm
 from django.core.cache import cache
 from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect, render
 from django.views.decorators.http import require_http_methods
+
+from . import security
 
 
 logger = logging.getLogger(__name__)
 
 User = get_user_model()
 
-SESSION_KEY = "heartcare_password_reset"
+SESSION_KEY = "cardionova_password_reset"
 
 OTP_EXPIRY = getattr(
     settings,
@@ -93,10 +97,8 @@ def password_reset_request(request):
         email.encode("utf-8")
     ).hexdigest()
 
-    ip_address = request.META.get(
-        "REMOTE_ADDR",
-        "unknown",
-    )
+    # Behind a reverse proxy REMOTE_ADDR is the proxy itself; client_ip() honours TRUSTED_PROXY_COUNT.
+    ip_address = security.client_ip(request) or "unknown"
 
     ip_hash = hashlib.sha256(
         ip_address.encode("utf-8")
@@ -145,7 +147,7 @@ def password_reset_request(request):
 
     message = (
         f"Hello {user.get_username()},\n\n"
-        f"Your HeartCare password-reset code is: {otp}\n\n"
+        f"Your CardioNova password-reset code is: {otp}\n\n"
         "This code expires in 10 minutes.\n"
         "If you did not request this code, ignore this email.\n\n"
         "Do not share this code with anyone."
@@ -153,7 +155,7 @@ def password_reset_request(request):
 
     try:
         send_mail(
-            subject="HeartCare password reset code",
+            subject="CardioNova password reset code",
             message=message,
             from_email=settings.DEFAULT_FROM_EMAIL,
             recipient_list=[user.email],
@@ -163,7 +165,7 @@ def password_reset_request(request):
     except Exception:
         # Never log the OTP or expose mail-server errors.
         logger.exception(
-            "HeartCare password-reset email delivery failed"
+            "CardioNova password-reset email delivery failed"
         )
 
         _clear_reset_session(request)
@@ -346,3 +348,12 @@ def password_reset_complete(request):
         request,
         "prediction/password_reset_complete.html",
     )
+
+class RateLimitedPasswordResetView(auth_views.PasswordResetView):
+    """Django's e-mail-link reset, limited per IP address so it cannot be used to flood inboxes."""
+
+    def post(self, request, *args, **kwargs):
+        if security.hit("password_reset_link", security.client_ip(request)):
+            # Same answer as a normal request: it reveals nothing and sends nothing.
+            return HttpResponseRedirect(self.get_success_url())
+        return super().post(request, *args, **kwargs)

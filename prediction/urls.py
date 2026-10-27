@@ -23,7 +23,7 @@ urlpatterns = [
     # =========================
     path(
         "password-reset/link/",
-        auth_views.PasswordResetView.as_view(
+        reset_views.RateLimitedPasswordResetView.as_view(
             template_name="prediction/password_reset_link_form.html",
             email_template_name="prediction/password_reset_email.txt",
             subject_template_name="prediction/password_reset_subject.txt",

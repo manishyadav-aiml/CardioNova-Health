@@ -76,8 +76,13 @@ def risk_level(probability):
 def predict_many(frame):
     """frame: DataFrame with the 13 feature columns. Returns a list of probabilities (0-1)."""
     model, prep = _load()
-    scaled = prep.transform(frame[FEATURES])
-    return [float(p) for p in model.predict_proba(scaled)[:, 1]]
+    estimator = getattr(model, "estimator", model)
+    uses_pipeline = (
+        hasattr(estimator, "named_steps")
+        and "prep" in estimator.named_steps
+    )
+    inputs = frame[FEATURES] if uses_pipeline else prep.transform(frame[FEATURES])
+    return [float(p) for p in model.predict_proba(inputs)[:, 1]]
 
 
 def predict_probability(values):
@@ -160,9 +165,14 @@ def _fold_probabilities(frame):
     members = getattr(model, "calibrated_classifiers_", None)
     if not members or len(members) < 2:
         return []
-    scaled = prep.transform(frame[FEATURES])
+    estimator = getattr(model, "estimator", model)
+    uses_pipeline = (
+        hasattr(estimator, "named_steps")
+        and "prep" in estimator.named_steps
+    )
+    inputs = frame[FEATURES] if uses_pipeline else prep.transform(frame[FEATURES])
     try:
-        return [float(m.predict_proba(scaled)[0, 1]) for m in members]
+        return [float(m.predict_proba(inputs)[0, 1]) for m in members]
     except Exception:
         return []
 
@@ -194,20 +204,25 @@ def reliability(values):
         prob_range = (round(min(folds) * 100, 1), round(max(folds) * 100, 1))
         if spread >= 20:
             score += 2
-            reasons.append(f"The internal models disagree strongly (spread {spread:.0f} percentage points).")
+            reasons.append(f"The cross-validation fold models disagree strongly (spread {spread:.0f} percentage points).")
         elif spread >= 10:
             score += 1
-            reasons.append(f"The internal models differ noticeably (spread {spread:.0f} percentage points).")
+            reasons.append(f"The cross-validation fold models differ noticeably (spread {spread:.0f} percentage points).")
 
     nearest = min(abs(probability - LOW_LIMIT), abs(probability - HIGH_LIMIT)) * 100
     if nearest < BORDER_POINTS:
         score += 1
         reasons.append("The estimate is close to a risk-level limit, so a small change could move it to another level.")
 
+    warnings = input_warnings(values)
+    if warnings:
+        score += 1
+        reasons.extend(warnings)
+
     level, label = ("good", "Good") if score == 0 else ("fair", "Fair") if score <= 2 else ("low", "Low")
     if not reasons:
-        reasons.append("Inputs are typical for the training data and the internal models agree.")
-    return {"level": level, "label": label, "reasons": reasons, "range": prob_range}
+        reasons.append("Inputs are typical for the training data; fold-disagreement range is unavailable for this model.")
+    return {"level": level, "label": label, "reasons": reasons, "range": prob_range, "warnings": warnings}
 
 
 def _pts(difference):
@@ -253,3 +268,75 @@ def target_scenarios(values):
     return [{"feature": n, "label": m["label"], "unit": m["unit"], "current": values[n], "target": m["target"],
              "after": round(probs[i + 1] * 100, 1), "delta": _pts(probs[i + 1] - probs[0])}
             for i, (n, m) in enumerate(chosen)]
+
+
+# =========================================================================== data-entry checks and plain-language summary
+def input_warnings(values):
+    """
+    Plain-language checks for values that are possible but suspicious: typing slips, wrong units, or a
+    resting pulse entered as the exercise maximum. They never block a prediction; they lower the trust check.
+    """
+    found = []
+    age, rate = values["age"], values["thalach"]
+    predicted_max = 220 - age                    # common rough rule, only used to spot implausible entries
+    if age >= 10 and rate < 0.5 * predicted_max:
+        found.append(f"Maximum heart rate {rate:g} bpm is far below the age-predicted maximum (about {predicted_max} bpm). "
+                     "Check that it is the peak value from the exercise test, not a resting pulse.")
+    if values["trestbps"] < 90:
+        found.append(f"Resting blood pressure {values['trestbps']:g} mm Hg is unusually low for a systolic reading. "
+                     "Check the value and that it is the upper (systolic) number.")
+    if values["chol"] < 125:
+        found.append(f"Cholesterol {values['chol']:g} mg/dl is unusually low. Check the value and the unit (mg/dl, not mmol/L).")
+    return found
+
+
+_TEST_FEATURES = {"cp", "restecg", "thalach", "exang", "oldpeak", "slope", "ca", "thal"}
+_ROUTINE_FEATURES = {"trestbps", "chol", "fbs"}
+
+
+def narrative(probability, level, explanation, trust=None):
+    """
+    Plain-language explanation of one result, written from the model's own outputs by fixed rules.
+    Nothing is sent to an outside service. The wording describes the MODEL's estimate, never a diagnosis.
+
+    probability: percent (0-100); level: LOW / MODERATE / HIGH;
+    explanation: the list stored with the record ({"feature", "label", "value", "delta"}, largest effect first);
+    trust: the dict returned by reliability(), or None.
+    Returns {"summary": str, "points": [str], "questions": [str]}.
+    """
+    word = {"LOW": "low", "MODERATE": "moderate", "HIGH": "high"}.get(level, "uncertain")
+    summary = f"The model estimates a {word} probability of heart disease ({probability:.1f}%) for the values entered."
+
+    points, top = [], []
+    if explanation:
+        top = [e for e in explanation if abs(e.get("delta", 0)) >= 1.0][:3]
+        for e in top:
+            direction = "raised" if e["delta"] > 0 else "lowered"
+            points.append(f"{e['label']} ({e['value']}) {direction} the estimate by about {abs(e['delta']):.1f} percentage points "
+                          "compared with a typical patient in the training data.")
+        if not top:
+            points.append("No single value changed the estimate by more than one percentage point.")
+    else:
+        points.append("Factor details are not stored for this record.")
+
+    if trust:
+        if trust["level"] == "good":
+            points.append("Trust check is Good: the inputs are typical for the training data and the model versions agree.")
+        elif trust["level"] == "fair":
+            points.append("Trust check is Fair: treat the number as approximate.")
+        else:
+            points.append("Trust check is Low: treat this number with extra caution and see the reasons listed above.")
+        if trust.get("range"):
+            points.append(f"Across the cross-validation fold models the estimate ranges from {trust['range'][0]}% to {trust['range'][1]}%.")
+
+    picked = {e.get("feature") for e in top}
+    questions = ["What does an estimate like this mean for someone with my history and symptoms?"]
+    if picked & _TEST_FEATURES:
+        questions.append("Which of my test results (ECG, stress test, imaging) should be repeated or explained in more detail?")
+    if picked & _ROUTINE_FEATURES:
+        questions.append("What blood pressure, cholesterol or blood sugar targets are right for me?")
+    questions.append("Do I need further tests or a follow-up, and how soon?" if level in ("MODERATE", "HIGH")
+                     else "How often should I have routine check-ups?")
+    if trust and trust["level"] == "low":
+        questions.append("Some values were unusual or uncertain. Can you confirm they were measured and recorded correctly?")
+    return {"summary": summary, "points": points, "questions": questions}
