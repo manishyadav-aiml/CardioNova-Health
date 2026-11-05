@@ -1,0 +1,17 @@
+/* 10 print stylesheet: a clean black-and-white page without navigation or buttons */
+@page { margin: 16mm; }
+* { box-shadow: none !important; text-shadow: none !important; animation: none !important; transition: none !important; }
+html, body { background: #fff !important; color: #000 !important; font-size: 11pt; }
+body { display: block; }
+.navbar, .skip-link, #scroll-progress, #page-loader, .fab-contact, .back-to-top, .cookie-banner, .modal,
+.no-print, .form-actions, .nav-search, .filters, .pagination, .whatif, .hero-image, .chart-box, .chart-fallback { display: none !important; }
+.footer { background: #fff !important; color: #000 !important; border-top: 1px solid #999; }
+.footer a, .footer .small { color: #000 !important; }
+.container { max-width: none; padding: 0; }
+.panel, .card, .auth-box { border: 1px solid #bbb !important; background: #fff !important; page-break-inside: avoid; }
+h1, h2, h3 { color: #000 !important; page-break-after: avoid; }
+a { color: #000 !important; text-decoration: underline; }
+main a[href^="http"]::after { content: " (" attr(href) ")"; font-size: 9pt; }
+.result-top, .badge, .gauge, .gauge-zone, .bar, .trust { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.demo-banner { border: 2px solid #000; color: #000; background: #fff; }
+.table th, .table td { border-bottom: 1px solid #999; }

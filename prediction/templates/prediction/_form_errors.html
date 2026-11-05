@@ -1,0 +1,7 @@
+{# Summary shown on top of a form that has errors #}
+{% if form.errors %}
+<div class="form-state form-state-error" role="alert" tabindex="-1" id="form-error-summary">
+  <strong>Please fix the highlighted fields.</strong>
+  {% if form.non_field_errors %}<div>{{ form.non_field_errors }}</div>{% endif %}
+</div>
+{% endif %}

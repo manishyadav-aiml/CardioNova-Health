@@ -1,0 +1,41 @@
+{% extends "prediction/base.html" %}
+{% block title %}Input drift - CardioNova Health{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Input drift monitor</h1>
+  <p class="lead">Are the people using the app still similar to the people the model was trained on? A model can be accurate on its test set and still be unreliable on a different population. This page compares the inputs of recent predictions with the training data. It shows aggregate numbers only.</p>
+
+  <p>Period:
+    {% for choice in choices %}
+      {% if choice == days %}<strong>{{ choice }} days</strong>{% else %}<a href="?days={{ choice }}">{{ choice }} days</a>{% endif %}{% if not forloop.last %} &middot; {% endif %}
+    {% endfor %}
+  </p>
+
+  {% if not has_reference %}
+    <div class="form-state form-state-error" role="alert"><strong>No training reference found.</strong> Run <code>python train_model.py</code> once so the model file contains the reference distribution.</div>
+  {% elif report.overall == 'insufficient' %}
+    <p><span class="badge badge-moderate">Not enough data</span> {{ report.n }} prediction{{ report.n|pluralize }} in the last {{ days }} days. At least {{ report.min_records }} are needed before a drift score means anything.</p>
+  {% else %}
+    <div class="stat-row">
+      <div class="stat"><span class="stat-num">{{ report.n }}</span><span class="small">recent predictions</span></div>
+      <div class="stat"><span class="stat-num">{% widthratio report.out_of_range_share 1 100 %}%</span><span class="small">with an input outside the training range</span></div>
+      <div class="stat {% if report.overall == 'drift' %}high{% elif report.overall == 'watch' %}moderate{% else %}low{% endif %}"><span class="stat-num">{{ report.overall|title }}</span><span class="small">overall</span></div>
+    </div>
+    <div class="table-wrap">
+      <table class="table compact">
+        <thead><tr><th>Input</th><th>Adjusted PSI</th><th>Status</th><th>What changed</th></tr></thead>
+        <tbody>
+        {% for f in report.features %}
+          <tr>
+            <td>{{ f.name }}</td><td>{{ f.adjusted }}</td>
+            <td><span class="badge {% if f.status == 'drift' %}badge-high{% elif f.status == 'watch' %}badge-moderate{% else %}badge-low{% endif %}">{{ f.status }}</span></td>
+            <td class="small">{{ f.detail }}</td>
+          </tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <p class="small">PSI (population stability index): below 0.10 stable, 0.10 to 0.25 watch, 0.25 or more drift. The expected noise of small samples is subtracted first. Training reference: {{ report.training_records }} records. The same report is available on the command line: <code>python manage.py drift_report --days {{ days }}</code>.</p>
+  {% endif %}
+</section>
+{% endblock %}

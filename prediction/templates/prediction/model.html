@@ -1,0 +1,148 @@
+{% extends "prediction/base.html" %}
+{% load static %}
+{% block title %}Model details - CardioNova Health{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Model details and evaluation</h1>
+  {% if not info %}
+    <p>No trained model information found. Run <code>python train_model.py</code> and restart the server.</p>
+  {% else %}
+  <p>
+    Selected model: <strong>{{ info.best_model }}</strong>.
+    {% if info.calibrated %}Probabilities were <strong>calibrated</strong> (sigmoid, 5-fold cross-validation; cross-validated Brier score {{ info.brier_cv.raw }} before, {{ info.brier_cv.calibrated }} after). The fold models also feed the trust check.
+    {% else %}The raw model is used (cross-validated Brier score {{ info.brier_cv.raw }}; calibrated {{ info.brier_cv.calibrated }}).{% endif %}
+    Trained on {{ info.train_rows }} records and tested once on {{ info.test_rows }} unseen records
+    (class 0: {{ info.class_counts.0 }}, class 1: {{ info.class_counts.1 }}). Trained {{ info.trained_at }} with scikit-learn {{ info.scikit_learn }}{% if info.quick_mode %} (quick mode){% endif %}.
+  </p>
+
+  <h2>Model comparison</h2>
+  <p class="small">Models are ranked by cross-validated ROC-AUC on the training data only; the test columns are reported after the choice was made.</p>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Model</th><th>CV ROC-AUC</th><th>Accuracy</th><th>Precision</th><th>Recall</th><th>F1</th><th>Test ROC-AUC</th><th>Brier</th></tr></thead>
+      <tbody>
+      {% for m in info.comparison %}
+        <tr {% if m.model == info.best_model %}class="best"{% endif %}>
+          <td>{{ m.model }}</td><td>{{ m.cv_roc_auc }}</td><td>{{ m.accuracy }}</td><td>{{ m.precision }}</td>
+          <td>{{ m.recall }}</td><td>{{ m.f1 }}</td><td>{{ m.roc_auc }}</td><td>{{ m.brier }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Final model on the test set</h2>
+  <div class="stat-row">
+    <div class="stat"><span class="stat-num">{{ info.metrics.accuracy }}</span><span class="small">accuracy</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.precision }}</span><span class="small">precision</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.recall }}</span><span class="small">recall</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.f1 }}</span><span class="small">F1-score</span></div>
+    <div class="stat"><span class="stat-num">{{ info.metrics.roc_auc }}</span><span class="small">ROC-AUC</span></div>
+  </div>
+  {% if info.metrics_ci %}
+  <p class="small">95% bootstrap intervals (the test set has only {{ info.test_rows }} records, so single numbers can mislead):
+    accuracy {{ info.metrics_ci.accuracy.0 }} to {{ info.metrics_ci.accuracy.1 }},
+    precision {{ info.metrics_ci.precision.0 }} to {{ info.metrics_ci.precision.1 }},
+    recall {{ info.metrics_ci.recall.0 }} to {{ info.metrics_ci.recall.1 }},
+    ROC-AUC {{ info.metrics_ci.roc_auc.0 }} to {{ info.metrics_ci.roc_auc.1 }}.</p>
+  {% endif %}
+  <p class="small">Confusion matrix at the usual 50% cut-off: TN {{ info.confusion.tn }}, FP {{ info.confusion.fp }}, FN {{ info.confusion.fn }}, TP {{ info.confusion.tp }}.</p>
+  {% if info.at_low_limit %}
+  <p class="small">A missed patient is the most serious error, so the app does not use 50% as its alarm line: anything at or above its own LOW/MODERATE limit ({{ info.at_low_limit.threshold }}) counts as "not low".
+    At that limit the test-set recall is <strong>{{ info.at_low_limit.metrics.recall }}</strong> (precision {{ info.at_low_limit.metrics.precision }}; TN {{ info.at_low_limit.confusion.tn }}, FP {{ info.at_low_limit.confusion.fp }}, FN {{ info.at_low_limit.confusion.fn }}, TP {{ info.at_low_limit.confusion.tp }}).
+    The limit was fixed in advance and not tuned on the test set.</p>
+  {% endif %}
+
+  <h2>External validation</h2>
+  {% if info.external_validation %}
+  <p class="small">The final model was trained only on the Cleveland file and then tested on separate hospitals' data. Missing values (including impossible zeros) were filled with medians learned from the training data. These files were never used for training.</p>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>File</th><th>Rows</th><th>Missing values</th><th>Accuracy</th><th>Recall</th><th>Recall at LOW limit</th><th>ROC-AUC</th></tr></thead>
+      <tbody>
+      {% for name, m in info.external_validation.items %}
+        <tr><td>{{ name }}</td><td>{{ m.rows }}</td><td>{{ m.missing_share|default:"-" }}</td><td>{{ m.accuracy }}</td><td>{{ m.recall }}</td><td>{{ m.recall_at_low_limit }}</td><td>{{ m.roc_auc }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% with levels=info.external_validation.pooled.trust_levels %}
+  {% if levels %}
+  <p class="small">Does the trust check still work on other hospitals' data? Error rate at the 50% cut-off: Good {{ levels.good.error_pct }}% ({{ levels.good.n }} records), Fair {{ levels.fair.error_pct }}% ({{ levels.fair.n }}), Low {{ levels.low.error_pct }}% ({{ levels.low.n }}).</p>
+  {% endif %}
+  {% endwith %}
+  {% endif %}
+  {% if info.external_skipped %}
+  <p class="small"><strong>Skipped files:</strong>
+    {% for item in info.external_skipped %}{{ item.file }} ({{ item.reason }}){% if not forloop.last %}; {% endif %}{% endfor %}.</p>
+  {% endif %}
+  {% if not info.external_validation %}
+    <p>No usable external data yet. Run <code>python scripts/fetch_uci_external.py</code>, then <code>python train_model.py</code>: the Hungarian, Switzerland and VA files are tested here, site by site and pooled.</p>
+  {% endif %}
+
+  <h2>Which inputs matter most</h2>
+  <p class="small">Permutation importance on the test set: how much the ROC-AUC drops when one input is shuffled (shown as a share of the total).</p>
+  <div class="factors">
+    {% for f in info.feature_importance %}
+    <div class="factor">
+      <div class="factor-name">{{ f.feature }}</div>
+      <div class="factor-bar"><div class="bar up" data-width="{{ f.bar }}"></div></div>
+      <div class="factor-delta">{{ f.importance }}%</div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if runs %}
+  <h2>Training runs (experiment log)</h2>
+  <p class="small">Every training run is recorded in <code>model/experiments.jsonl</code> (and in MLflow with <code>--mlflow</code>), with a fingerprint of the data, so results can be traced and compared.</p>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Trained</th><th>Model</th><th>Data fingerprint</th><th>CV ROC-AUC</th><th>Test ROC-AUC</th><th>Recall at LOW limit</th></tr></thead>
+      <tbody>
+      {% for run in runs %}
+        <tr><td>{{ run.trained_at }}{% if run.quick_mode %} (quick){% endif %}</td><td>{{ run.best_model }}</td><td><code>{{ run.dataset_sha256 }}</code></td><td>{{ run.cv_roc_auc }}</td><td>{{ run.metrics.roc_auc }}</td><td>{{ run.recall_at_low_limit }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+
+  {% if info.trust_validation %}
+  <h2>Does the trust check work?</h2>
+  <p class="small">{{ info.trust_validation.method }}. A working trust check should show a clearly higher error rate where it says Low.</p>
+  <div class="table-wrap">
+    <table class="table compact">
+      <thead><tr><th>Trust level</th><th>Predictions</th><th>Wrong (50% cut-off)</th><th>Error rate (95% interval)</th></tr></thead>
+      <tbody>
+        {% with level=info.trust_validation.levels.good %}<tr><td>Good</td><td>{{ level.n }}</td><td>{{ level.errors }}</td><td>{{ level.error_pct }}% ({{ level.ci_pct.0 }}% to {{ level.ci_pct.1 }}%)</td></tr>{% endwith %}
+        {% with level=info.trust_validation.levels.fair %}<tr><td>Fair</td><td>{{ level.n }}</td><td>{{ level.errors }}</td><td>{{ level.error_pct }}% ({{ level.ci_pct.0 }}% to {{ level.ci_pct.1 }}%)</td></tr>{% endwith %}
+        {% with level=info.trust_validation.levels.low %}<tr><td>Low</td><td>{{ level.n }}</td><td>{{ level.errors }}</td><td>{{ level.error_pct }}% ({{ level.ci_pct.0 }}% to {{ level.ci_pct.1 }}%)</td></tr>{% endwith %}
+      </tbody>
+    </table>
+  </div>
+  <p class="small">If the app only answered when trust was Good or Fair, it would answer {{ info.trust_validation.selective.1.coverage_pct }}% of cases with {{ info.trust_validation.selective.1.accuracy_pct }}% accuracy (all cases: {{ info.trust_validation.selective.0.accuracy_pct }}%). The trust score alone separates right from wrong predictions with ROC-AUC {{ info.trust_validation.auc_score_vs_error }}.</p>
+  {% endif %}
+
+  <h2>Model card</h2>
+  <div class="table-wrap">
+    <table class="table compact">
+      <tbody>
+        <tr><th>Intended use</th><td>Education and demonstration of an uncertainty-aware ML workflow. Not a medical device.</td></tr>
+        <tr><th>Not intended for</th><td>Diagnosis, treatment decisions, triage, or use on patients.</td></tr>
+        <tr><th>Training data</th><td>UCI Cleveland heart disease data, {{ info.rows }} complete records, 13 attributes, target converted to disease / no disease.</td></tr>
+        <tr><th>Known limits</th><td>Small, single-site, mostly older patients, historical data. Inputs outside the training range are flagged by the trust check.</td></tr>
+        <tr><th>Explanations</th><td>Median-replacement ablation: each input is swapped for the training median and the change in probability is shown. Associations, not causes.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Charts</h2>
+  <div class="figure-grid">
+    {% for fig in info.figures %}
+      <img src="{% static 'prediction/reports/'|add:fig %}" alt="{{ fig }}" loading="lazy">
+    {% endfor %}
+  </div>
+  <p class="small">Risk levels: below 30% low, 30% to below 60% moderate, 60% and above high (fixed limits chosen for this project, not clinical thresholds). This system is a screening aid and not a diagnosis.</p>
+  {% endif %}
+</section>
+{% endblock %}

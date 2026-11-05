@@ -1,0 +1,489 @@
+{
+  "best_model": "Gradient Boosting",
+  "calibrated": true,
+  "brier_cv": {
+    "raw": 0.1392,
+    "calibrated": 0.1411
+  },
+  "features": [
+    "age",
+    "sex",
+    "cp",
+    "trestbps",
+    "chol",
+    "fbs",
+    "restecg",
+    "thalach",
+    "exang",
+    "oldpeak",
+    "slope",
+    "ca",
+    "thal"
+  ],
+  "rows": 297,
+  "class_counts": {
+    "0": 160,
+    "1": 137
+  },
+  "train_rows": 237,
+  "test_rows": 60,
+  "comparison": [
+    {
+      "model": "Gradient Boosting",
+      "cv_roc_auc": 0.894,
+      "params": {
+        "learning_rate": 0.05,
+        "max_depth": 2,
+        "n_estimators": 100
+      },
+      "accuracy": 0.817,
+      "precision": 0.84,
+      "recall": 0.75,
+      "f1": 0.792,
+      "brier": 0.118,
+      "roc_auc": 0.924
+    },
+    {
+      "model": "Random Forest",
+      "cv_roc_auc": 0.891,
+      "params": {
+        "max_depth": null,
+        "min_samples_leaf": 3,
+        "n_estimators": 200
+      },
+      "accuracy": 0.833,
+      "precision": 0.875,
+      "recall": 0.75,
+      "f1": 0.808,
+      "brier": 0.108,
+      "roc_auc": 0.941
+    },
+    {
+      "model": "Stacking Ensemble",
+      "cv_roc_auc": 0.888,
+      "params": {},
+      "accuracy": 0.85,
+      "precision": 0.913,
+      "recall": 0.75,
+      "f1": 0.824,
+      "brier": 0.098,
+      "roc_auc": 0.948
+    },
+    {
+      "model": "Voting Ensemble",
+      "cv_roc_auc": 0.885,
+      "params": {},
+      "accuracy": 0.867,
+      "precision": 0.917,
+      "recall": 0.786,
+      "f1": 0.846,
+      "brier": 0.1,
+      "roc_auc": 0.952
+    },
+    {
+      "model": "Support Vector Machine",
+      "cv_roc_auc": 0.884,
+      "params": {
+        "C": 0.1,
+        "gamma": 0.01
+      },
+      "accuracy": 0.883,
+      "precision": 0.862,
+      "recall": 0.893,
+      "f1": 0.877,
+      "brier": 0.092,
+      "roc_auc": 0.953
+    },
+    {
+      "model": "Logistic Regression",
+      "cv_roc_auc": 0.88,
+      "params": {
+        "C": 0.01,
+        "class_weight": null
+      },
+      "accuracy": 0.867,
+      "precision": 0.917,
+      "recall": 0.786,
+      "f1": 0.846,
+      "brier": 0.125,
+      "roc_auc": 0.951
+    },
+    {
+      "model": "K-Nearest Neighbors",
+      "cv_roc_auc": 0.872,
+      "params": {
+        "n_neighbors": 15,
+        "weights": "distance"
+      },
+      "accuracy": 0.85,
+      "precision": 0.88,
+      "recall": 0.786,
+      "f1": 0.83,
+      "brier": 0.085,
+      "roc_auc": 0.96
+    },
+    {
+      "model": "Decision Tree",
+      "cv_roc_auc": 0.838,
+      "params": {
+        "max_depth": 3,
+        "min_samples_leaf": 10
+      },
+      "accuracy": 0.8,
+      "precision": 0.833,
+      "recall": 0.714,
+      "f1": 0.769,
+      "brier": 0.159,
+      "roc_auc": 0.889
+    }
+  ],
+  "metrics": {
+    "accuracy": 0.817,
+    "precision": 0.87,
+    "recall": 0.714,
+    "f1": 0.784,
+    "brier": 0.121,
+    "roc_auc": 0.925
+  },
+  "confusion": {
+    "tn": 29,
+    "fp": 3,
+    "fn": 8,
+    "tp": 20
+  },
+  "metrics_ci": {
+    "accuracy": [
+      0.717,
+      0.917
+    ],
+    "precision": [
+      0.72,
+      1.0
+    ],
+    "recall": [
+      0.536,
+      0.885
+    ],
+    "roc_auc": [
+      0.851,
+      0.982
+    ]
+  },
+  "at_low_limit": {
+    "threshold": 0.3,
+    "metrics": {
+      "accuracy": 0.833,
+      "precision": 0.765,
+      "recall": 0.929,
+      "f1": 0.839,
+      "brier": 0.121,
+      "roc_auc": 0.925
+    },
+    "confusion": {
+      "tn": 24,
+      "fp": 8,
+      "fn": 2,
+      "tp": 26
+    }
+  },
+  "trust_validation": {
+    "method": "10-fold nested cross-validation on all 297 records; each record is scored by a model that never saw it; trust computed with the web app's own rules (training ranges from the training folds only)",
+    "n": 297,
+    "levels": {
+      "good": {
+        "n": 66,
+        "errors": 2,
+        "error_rate": 0.03,
+        "error_pct": 3.0,
+        "ci": [
+          0.008,
+          0.104
+        ],
+        "ci_pct": [
+          0.8,
+          10.4
+        ],
+        "brier": 0.038
+      },
+      "fair": {
+        "n": 189,
+        "errors": 32,
+        "error_rate": 0.169,
+        "error_pct": 16.9,
+        "ci": [
+          0.123,
+          0.229
+        ],
+        "ci_pct": [
+          12.3,
+          22.9
+        ],
+        "brier": 0.139
+      },
+      "low": {
+        "n": 42,
+        "errors": 16,
+        "error_rate": 0.381,
+        "error_pct": 38.1,
+        "ci": [
+          0.25,
+          0.532
+        ],
+        "ci_pct": [
+          25.0,
+          53.2
+        ],
+        "brier": 0.237
+      }
+    },
+    "selective": [
+      {
+        "answered": "all records",
+        "coverage": 1.0,
+        "coverage_pct": 100.0,
+        "accuracy": 0.832,
+        "accuracy_pct": 83.2,
+        "n": 297
+      },
+      {
+        "answered": "Good + Fair only",
+        "coverage": 0.859,
+        "coverage_pct": 85.9,
+        "accuracy": 0.867,
+        "accuracy_pct": 86.7,
+        "n": 255
+      },
+      {
+        "answered": "Good only",
+        "coverage": 0.222,
+        "coverage_pct": 22.2,
+        "accuracy": 0.97,
+        "accuracy_pct": 97.0,
+        "n": 66
+      }
+    ],
+    "auc_score_vs_error": 0.701
+  },
+  "drift_reference": {
+    "n": 297,
+    "numeric": {
+      "age": {
+        "edges": [
+          45.0,
+          53.0,
+          58.0,
+          62.8
+        ],
+        "shares": [
+          0.178451,
+          0.208754,
+          0.198653,
+          0.212121,
+          0.20202
+        ],
+        "mean": 54.5421,
+        "sd": 9.0345,
+        "low": 34.96,
+        "high": 71.12
+      },
+      "trestbps": {
+        "edges": [
+          118.4,
+          126.0,
+          134.0,
+          145.0
+        ],
+        "shares": [
+          0.20202,
+          0.195286,
+          0.191919,
+          0.205387,
+          0.205387
+        ],
+        "mean": 131.6936,
+        "sd": 17.7329,
+        "low": 100.0,
+        "high": 180.0
+      },
+      "chol": {
+        "edges": [
+          204.2,
+          231.0,
+          254.6,
+          287.6
+        ],
+        "shares": [
+          0.20202,
+          0.191919,
+          0.205387,
+          0.198653,
+          0.20202
+        ],
+        "mean": 247.3502,
+        "sd": 51.91,
+        "low": 148.68,
+        "high": 407.08
+      },
+      "thalach": {
+        "edges": [
+          130.0,
+          146.4,
+          159.0,
+          170.0
+        ],
+        "shares": [
+          0.195286,
+          0.205387,
+          0.191919,
+          0.20202,
+          0.205387
+        ],
+        "mean": 149.5993,
+        "sd": 22.9029,
+        "low": 94.8,
+        "high": 192.08
+      },
+      "oldpeak": {
+        "edges": [
+          0.0,
+          0.4,
+          1.2,
+          1.9
+        ],
+        "shares": [
+          0.0,
+          0.393939,
+          0.198653,
+          0.191919,
+          0.215488
+        ],
+        "mean": 1.0556,
+        "sd": 1.1642,
+        "low": 0.0,
+        "high": 4.208
+      }
+    },
+    "categorical": {
+      "sex": {
+        "0": 0.323232,
+        "1": 0.676768
+      },
+      "cp": {
+        "1": 0.077441,
+        "2": 0.164983,
+        "3": 0.279461,
+        "4": 0.478114
+      },
+      "fbs": {
+        "0": 0.855219,
+        "1": 0.144781
+      },
+      "restecg": {
+        "0": 0.494949,
+        "1": 0.013468,
+        "2": 0.491582
+      },
+      "exang": {
+        "0": 0.673401,
+        "1": 0.326599
+      },
+      "slope": {
+        "1": 0.468013,
+        "2": 0.461279,
+        "3": 0.070707
+      },
+      "ca": {
+        "0": 0.585859,
+        "1": 0.218855,
+        "2": 0.127946,
+        "3": 0.06734
+      },
+      "thal": {
+        "3": 0.552189,
+        "6": 0.060606,
+        "7": 0.387205
+      }
+    }
+  },
+  "external_validation": {},
+  "feature_importance": [
+    {
+      "feature": "ca",
+      "importance": 39.2
+    },
+    {
+      "feature": "thal",
+      "importance": 26.7
+    },
+    {
+      "feature": "cp",
+      "importance": 14.0
+    },
+    {
+      "feature": "oldpeak",
+      "importance": 9.9
+    },
+    {
+      "feature": "age",
+      "importance": 2.6
+    },
+    {
+      "feature": "sex",
+      "importance": 2.5
+    },
+    {
+      "feature": "exang",
+      "importance": 2.0
+    },
+    {
+      "feature": "slope",
+      "importance": 1.8
+    },
+    {
+      "feature": "thalach",
+      "importance": 1.4
+    },
+    {
+      "feature": "trestbps",
+      "importance": 0.0
+    },
+    {
+      "feature": "chol",
+      "importance": 0.0
+    },
+    {
+      "feature": "fbs",
+      "importance": 0.0
+    },
+    {
+      "feature": "restecg",
+      "importance": 0.0
+    }
+  ],
+  "baseline": {
+    "age": 56.0,
+    "sex": 1.0,
+    "cp": 3.0,
+    "trestbps": 130.0,
+    "chol": 243.0,
+    "fbs": 0.0,
+    "restecg": 0.0,
+    "thalach": 152.0,
+    "exang": 0.0,
+    "oldpeak": 0.8,
+    "slope": 2.0,
+    "ca": 0.0,
+    "thal": 3.0
+  },
+  "figures": [
+    "roc_curves.png",
+    "confusion_matrix.png",
+    "calibration_curve.png",
+    "feature_importance.png",
+    "model_comparison.png"
+  ],
+  "demo_data": false,
+  "quick_mode": false,
+  "scikit_learn": "1.8.0",
+  "trained_at": "2026-11-02 06:41"
+}

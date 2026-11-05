@@ -1,0 +1,2 @@
+# Optional: experiment tracking UI.   pip install -r requirements-mlops.txt   then   python train_model.py --mlflow   and   mlflow ui
+mlflow>=2.14

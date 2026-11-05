@@ -1,0 +1,21 @@
+{% extends "prediction/base.html" %}
+{% block title %}Two-factor login - CardioNova Health{% endblock %}
+{% block content %}
+<section class="auth-box">
+  <h1>Two-factor login</h1>
+  <p>Your password was correct. Enter the 6-digit code from your authenticator app to finish logging in. If you lost your phone, type one of your recovery codes instead.</p>
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if error %}<div class="form-state form-state-error" role="alert"><strong>{{ error }}</strong></div>{% endif %}
+    <div class="field">
+      <label for="code">Code</label>
+      <input type="text" id="code" name="code" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="20" required autofocus>
+    </div>
+    <button type="submit" class="btn btn-block">Verify and log in</button>
+  </form>
+
+  <p class="small">After 5 wrong codes this step is paused for 15 minutes. You have 5 minutes to enter the code.</p>
+  <p class="auth-switch"><a href="{% url 'login' %}">Back to login</a></p>
+</section>
+{% endblock %}

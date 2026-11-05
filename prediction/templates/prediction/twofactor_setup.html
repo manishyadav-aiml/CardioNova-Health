@@ -1,0 +1,94 @@
+{% extends "prediction/base.html" %}
+{% block title %}Two-factor login - CardioNova Health{% endblock %}
+{% block content %}
+<section class="panel">
+  <h1>Two-factor login</h1>
+  <p class="lead">With two-factor login, a stolen password is not enough: you also need the 6-digit code from an authenticator app on your phone (Google Authenticator, Microsoft Authenticator, Authy, 1Password and similar).</p>
+  {% if error %}<div class="form-state form-state-error" role="alert"><strong>{{ error }}</strong></div>{% endif %}
+
+  {% if new_codes %}
+  <div class="token-box">
+    <strong>Your recovery codes (save them now, they are shown only once):</strong>
+    <pre id="recovery-codes" class="codebox">{% for code in new_codes %}{{ code }}
+{% endfor %}</pre>
+    <p class="small">Each code works once if you lose your phone. Keep them somewhere safe, for example a password manager or a printed copy.</p>
+    <button type="button" class="btn btn-small" data-copy="#recovery-codes">Copy codes</button>
+  </div>
+  {% endif %}
+
+  {% if enabled %}
+  <p><span class="badge badge-low">On</span> Two-factor login is switched on. Recovery codes left: <strong>{{ codes_left }}</strong>.</p>
+
+  <h2>Create new recovery codes</h2>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="regenerate">
+    <div class="field">
+      <label for="regen-password">Password</label>
+      <input type="password" id="regen-password" name="password" class="form-control" autocomplete="current-password" required>
+    </div>
+    <div class="field">
+      <label for="regen-code">Code from your app</label>
+      <input type="text" id="regen-code" name="code" class="form-control" inputmode="numeric" autocomplete="one-time-code" required>
+    </div>
+    <button type="submit" class="btn btn-small" data-confirm="The old recovery codes will stop working." data-confirm-title="New recovery codes" data-confirm-ok="Create new codes">Create new codes</button>
+  </form>
+
+  <section class="panel danger-zone">
+    <h2>Switch two-factor login off</h2>
+    <p>Your account will be protected by the password alone. Enter your password and a current code to confirm.</p>
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="action" value="disable">
+      <div class="field">
+        <label for="disable-password">Password</label>
+        <input type="password" id="disable-password" name="password" class="form-control" autocomplete="current-password" required>
+      </div>
+      <div class="field">
+        <label for="disable-code">Code from your app (or a recovery code)</label>
+        <input type="text" id="disable-code" name="code" class="form-control" autocomplete="one-time-code" required>
+      </div>
+      <button type="submit" class="btn btn-danger" data-confirm="Your account will be protected by the password alone." data-confirm-title="Switch off two-factor login" data-confirm-ok="Switch off">Switch off two-factor login</button>
+    </form>
+  </section>
+
+  {% elif secret %}
+  <h2>Set up in 3 steps</h2>
+  <ol>
+    <li>Open your authenticator app and choose <em>add account</em>, then <em>enter a setup key</em>.</li>
+    <li>Type this key (spaces do not matter), with the account name <code>{{ user.username }}</code>, type <em>time-based</em>:
+      <div class="token-box">
+        <code id="totp-secret">{{ secret }}</code>
+        <button type="button" class="btn btn-small" data-copy="#totp-secret">Copy key</button>
+      </div>
+      <details>
+        <summary class="small">Show the full otpauth link (for password managers)</summary>
+        <code id="totp-uri" class="small">{{ uri }}</code>
+      </details>
+    </li>
+    <li>Enter the 6-digit code that the app now shows:</li>
+  </ol>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="confirm">
+    <div class="field">
+      <label for="confirm-code">6-digit code</label>
+      <input type="text" id="confirm-code" name="code" class="form-control" inputmode="numeric" autocomplete="one-time-code" maxlength="10" required>
+    </div>
+    <button type="submit" class="btn">Turn on two-factor login</button>
+    <a class="btn btn-outline" href="{% url 'profile' %}">Cancel</a>
+  </form>
+  <p class="small">If the code is rejected, check that the time on your phone is set automatically.</p>
+
+  {% else %}
+  <p><span class="badge badge-moderate">Off</span> Two-factor login is switched off.</p>
+  <form method="post">
+    {% csrf_token %}
+    <input type="hidden" name="action" value="start">
+    <button type="submit" class="btn">Set up two-factor login</button>
+  </form>
+  {% endif %}
+
+  <p class="small">The API token is not affected by two-factor login: keep it private. The administrator login page has its own protection (private address and rate limit).</p>
+</section>
+{% endblock %}

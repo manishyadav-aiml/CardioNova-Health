@@ -1,0 +1,71 @@
+{% extends "prediction/base.html" %}
+{% load static %}
+{% block content %}
+<section class="hero">
+  <div class="hero-text">
+    <h1>Explainable heart disease risk prediction</h1>
+    <p>Enter 13 health parameters and a calibrated Machine Learning model estimates the probability of heart disease, shows a risk level (<strong>LOW</strong>, <strong>MODERATE</strong> or <strong>HIGH</strong>) and explains which values pushed the estimate up or down.</p>
+    <div class="hero-actions">
+      {% if user.is_authenticated %}
+        <a href="{% url 'predict' %}" class="btn">Start Prediction</a>
+        <a href="{% url 'batch' %}" class="btn btn-outline">Batch CSV</a>
+      {% else %}
+        <a href="{% url 'register' %}" class="btn">Create Account</a>
+        <a href="{% url 'login' %}" class="btn btn-outline">Login</a>
+      {% endif %}
+    </div>
+  </div>
+  <div class="hero-image">
+    <img src="{% static 'prediction/images/heart.svg' %}" alt="Heart with ECG line" width="260" height="260">
+  </div>
+</section>
+
+<section class="cards">
+  <div class="card card-new"><h3>Trust check <span class="badge badge-new">New</span></h3><p>The system tells you when its own estimate should be trusted less: unusual inputs, disagreeing models or a borderline result.</p></div>
+  <div class="card card-new"><h3>What-if simulator <span class="badge badge-new">New</span></h3><p>Move blood pressure, cholesterol or blood sugar and watch the estimate react instantly.</p></div>
+  <div class="card"><h3>Explainable</h3><p>Every result lists the factors that raised or lowered the estimated risk.</p></div>
+  <div class="card"><h3>Validated model</h3><p>Six tuned models and two ensembles are compared; probabilities are calibrated and checked on external data.</p></div>
+  <div class="card"><h3>Patients and doctors</h3><p>Patients keep a history with charts. Doctors can review patients who share their data.</p></div>
+  <div class="card"><h3>Batch and API</h3><p>Upload a CSV for many patients, or call the JSON API with a personal token.</p></div>
+</section>
+
+{% if user.is_authenticated %}
+<section class="panel">
+  <h2>Your recent predictions</h2>
+  {% if recent %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Date</th><th>Label</th><th>Age</th><th>Probability</th><th>Risk level</th><th></th></tr></thead>
+      <tbody>
+      {% for r in recent %}
+        <tr>
+          <td>{{ r.created_at|date:"d M Y, H:i" }}</td>
+          <td>{{ r.patient_label|default:"-" }}</td>
+          <td>{{ r.age }}</td>
+          <td>{{ r.probability|floatformat:1 }}%</td>
+          <td><span class="badge badge-{{ r.risk_level|lower }}">{{ r.risk_level }}</span></td>
+          <td><a href="{% url 'result' r.pk %}">View</a></td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p><a href="{% url 'history' %}">See full history and chart</a></p>
+  {% else %}
+    <p>You have not made any prediction yet. <a href="{% url 'predict' %}">Make your first prediction</a>.</p>
+  {% endif %}
+</section>
+{% endif %}
+
+{% if model_info.best_model %}
+<section class="panel">
+  <h2>About the model</h2>
+  <p>
+    Selected model: <strong>{{ model_info.best_model }}</strong>{% if model_info.calibrated %} (probabilities calibrated){% endif %},
+    trained on {{ model_info.rows }} records with {{ model_info.features|length }} attributes.
+    Test-set results: accuracy {{ model_info.metrics.accuracy }}, recall {{ model_info.metrics.recall }},
+    ROC-AUC {{ model_info.metrics.roc_auc }}. <a href="{% url 'model' %}">See the full evaluation</a>.
+  </p>
+</section>
+{% endif %}
+{% endblock %}
