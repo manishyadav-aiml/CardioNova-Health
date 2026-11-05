@@ -11,8 +11,17 @@
   <img src="https://img.shields.io/badge/tests-178_cases-success?style=for-the-badge" alt="Tests">
 </p>
 
-</div>
+<p>
+  <a href="https://heart-disease-prediction-13n6.onrender.com/">
+    🚀 <strong>Live Demo</strong>
+  </a>
+  &nbsp; | &nbsp;
+  <a href="https://github.com/manishyadav-aiml/CardioNova-Health">
+    💻 <strong>GitHub Repository</strong>
+  </a>
+</p>
 
+</div>
 > **Medical disclaimer.** CardioNova Health is an educational and portfolio project. It is not a medical device, does not diagnose, treat or prevent any disease, and must not be used for medical decisions. See [Limitations](#-limitations).
 
 ## 💡 What makes it different
@@ -162,9 +171,12 @@ Run the external validation (script ready) · fairness analysis by sex and age �
 
 ## 👨‍💻 Author
 
-**Manish Kumar Yadav**, final-year B.Tech CSE (AI/ML), Sandip University, Nashik.
-GitHub: https://github.com/manishyadav-aiml · Repository: https://github.com/manishyadav-aiml/CardioNova-Health
+**Manish Kumar Yadav**  
+B.Tech in Computer Science and Engineering (AI/ML) | Sandip University, Nashik
 
+- **GitHub:** [manishyadav-aiml](https://github.com/manishyadav-aiml)
+- **Project Repository:** [CardioNova Health](https://github.com/manishyadav-aiml/CardioNova-Health)
+- **Live Demo:** [CardioNova Health](https://heart-disease-prediction-13n6.onrender.com/)
 ## 📜 License
 
 MIT, see [LICENSE](LICENSE). Educational project, not a medical device.
